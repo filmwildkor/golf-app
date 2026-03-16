@@ -45,8 +45,13 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
 .flagToggles{display:flex;gap:4px;margin-top:8px}
 
 /* 정산 */
-.settle{border:1px solid #d1fae5;background:linear-gradient(90deg,#ecfdf5,#f7fee7);border-radius:20px;padding:11px;margin-top:8px}
-.settle-text{font-size:14px;font-weight:800;line-height:1.5;color:#064e3b;white-space:pre-line}
+.settle{border:1px solid #d1fae5;background:linear-gradient(90deg,#ecfdf5,#f7fee7);border-radius:20px;padding:11px 14px;margin-top:8px;min-height:74px;display:flex;align-items:center}
+.settle-inner{width:100%}
+.settle-line{display:flex;align-items:baseline;gap:4px;line-height:1.7}
+.settle-key{font-size:11px;font-weight:700;color:#047857;width:36px;flex-shrink:0}
+.settle-val{font-size:13px;font-weight:800;color:#064e3b;display:flex;flex-wrap:wrap;gap:0 10px}
+.settle-item{white-space:nowrap}
+.settle-empty{font-size:13px;font-weight:700;color:#9ca3af;text-align:center;width:100%}
 
 /* 홀 이동 */
 .holesWrap{margin-top:8px}
@@ -233,19 +238,23 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
         <div style="font-size:26px;font-weight:900;line-height:1;color:#111827" id="holeText">1</div>
         <div style="font-size:13px;font-weight:400;color:#9ca3af" id="holeProgress">/18</div>
       </div>
-      <div style="display:flex;gap:5px;flex:1;min-width:0">
-        <button id="spinBtn" onclick="spinCurrentMode()" style="width:100px;flex-shrink:0;height:40px;border-radius:12px;border:none;background:#10b981;cursor:pointer;overflow:hidden;position:relative;padding:0">
+      <!-- 방식생성 + PAR3 왼쪽 밀착 -->
+      <div style="display:flex;gap:5px;flex-shrink:0">
+        <button id="spinBtn" onclick="spinCurrentMode()" style="width:100px;height:40px;border-radius:12px;border:none;background:#10b981;cursor:pointer;overflow:hidden;position:relative;padding:0">
           <div style="position:absolute;top:0;left:0;right:0;height:9px;background:linear-gradient(to bottom,rgba(0,0,0,0.15),transparent);z-index:2;pointer-events:none"></div>
           <div style="position:absolute;bottom:0;left:0;right:0;height:9px;background:linear-gradient(to top,rgba(0,0,0,0.15),transparent);z-index:2;pointer-events:none"></div>
           <div id="spinSlot" style="display:flex;flex-direction:column;will-change:transform">
             <div style="height:40px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;letter-spacing:0.3px">🎰 방식생성</div>
           </div>
         </button>
-        <button id="par3Btn" onclick="togglePar3()" style="width:50px;flex-shrink:0;height:40px;border-radius:12px;border:1px solid #e5e7eb;background:#f8fafc;font-size:10px;font-weight:900;color:#475569;cursor:pointer">PAR3</button>
-        <button id="lockToggleBtn" onclick="toggleLockCurrent()" style="width:50px;flex-shrink:0;height:40px;border-radius:12px;border:1px solid #e5e7eb;background:#f8fafc;font-size:10px;font-weight:900;color:#475569;cursor:pointer">LOCK</button>
+        <button id="par3Btn" onclick="togglePar3()" style="width:50px;height:40px;border-radius:12px;border:1px solid #e5e7eb;background:#f8fafc;font-size:10px;font-weight:900;color:#475569;cursor:pointer">PAR3</button>
       </div>
-      <div style="flex-shrink:0;width:86px;display:flex;align-items:center;justify-content:flex-end">
-        <div id="potText" style="font-size:20px;font-weight:900;color:#d97706;white-space:nowrap">0원</div>
+      <!-- 빈 공간 -->
+      <div style="flex:1;min-width:0"></div>
+      <!-- LOCK + 금액 오른쪽 -->
+      <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
+        <button id="lockToggleBtn" onclick="toggleLockCurrent()" style="width:50px;height:40px;border-radius:12px;border:1px solid #e5e7eb;background:#f8fafc;font-size:10px;font-weight:900;color:#475569;cursor:pointer">LOCK</button>
+        <div id="potText" style="font-size:20px;font-weight:900;color:#d97706;white-space:nowrap;min-width:80px;text-align:right">0원</div>
       </div>
     </div>
     <div id="teamBox" style="background:#f8fafc;border-radius:12px;height:40px;display:flex;align-items:center;justify-content:center;border:1px solid #e5e7eb">
@@ -254,7 +263,9 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
   </div>
   <div class="inner">
     <div class="scoreGrid" id="scoreGrid"></div>
-    <div class="settle"><div class="settle-text" id="settlementText">방식을 생성하고 점수를 입력해 주세요.</div></div>
+    <div class="settle" id="settleBox">
+      <div class="settle-inner" id="settlementText"></div>
+    </div>
     <div class="holesWrap">
       <div class="label" style="font-weight:700">홀 이동</div>
       <div class="holes" id="holesGrid"></div>
@@ -419,20 +430,21 @@ function recomputeRows(){
     }
     row.winner=winner;
     if(!winner){row.settlement="점수를 모두 입력해 주세요.";return;}
-    if(winner==="무승부"){row.settlement=`무승부 · 다음 홀에 +${money(stake)} 이월`;carry+=stake;return;}
     const lines=[];const pot=row.appliedPot;
-    if(row.mode==="개인전"){
+    if(winner==="무승부"){
+      lines.push(`무승부 · 다음 홀에 +${money(stake)} 이월`);carry+=stake;
+    }else if(row.mode==="개인전"){
       const ranked=[...PLAYERS].sort((a,b)=>compareRank(a,b,row));
-      lines.push("정산 : "+ranked.slice(1).map(p=>`${displayName(state.names,p)} ${jang(pot)}`).join("  "));
+      lines.push("정산 : "+ranked.slice(1).map(p=>`${displayName(state.names,p)} ${jang(pot)}`).join("  |  "));
     }else if(row.mode==="2:2"){
       const [left,right]=row.team.split(" vs ");
       const losers=(winner===left?right:left).split("+");
-      lines.push("정산 : "+losers.map(p=>`${displayName(state.names,p)} ${jang(pot)}`).join("  "));
+      lines.push("정산 : "+losers.map(p=>`${displayName(state.names,p)} ${jang(pot)}`).join("  |  "));
     }else if(row.mode==="1:3"){
       const calc=get13Calc(row);
       if(winner===calc.solo){
         const trio=row.team.split(" vs ")[1].split("+");
-        lines.push("정산 : "+trio.map(p=>`${displayName(state.names,p)} ${jang(pot)}`).join("  "));
+        lines.push("정산 : "+trio.map(p=>`${displayName(state.names,p)} ${jang(pot)}`).join("  |  "));
       }else{
         lines.push(`정산 : ${displayName(state.names,calc.solo)} ${jang(pot*3)}`);
       }
@@ -440,12 +452,13 @@ function recomputeRows(){
     if(row.par3&&state.rules.nearEnabled){
       const nearWinner=PLAYERS.find(p=>row.flags[p].near);
       if(nearWinner){
-        lines.push("니어 : "+PLAYERS.filter(p=>p!==nearWinner).map(p=>`${displayName(state.names,p)} ${jang(10000)}`).join("  "));
+        lines.push("니어 : "+PLAYERS.filter(p=>p!==nearWinner).map(p=>`${displayName(state.names,p)} ${jang(10000)}`).join("  |  "));
       }else{
         lines.push("니어 : 미결정");
       }
     }
-    row.settlement=lines.join("\n");carry=0;
+    row.settlement=lines.join("\n");
+    if(winner!=="무승부")carry=0;
   });
 }
 function calcTotals(){
@@ -658,7 +671,22 @@ function render(){
     teamEl.style.color='#9ca3af';teamEl.textContent='방식을 생성해주세요';
     teamBox.style.background='#f8fafc';teamBox.style.border='1px solid #e5e7eb';
   }
-  el.settlementText.textContent=isZero?"방식을 생성하고 점수를 입력해 주세요.":(prettyText(row.settlement,state.names)||"방식을 생성하고 점수를 입력해 주세요.");
+  // 정산 칸 렌더링
+  const settleEl=document.getElementById('settlementText');
+  const settleText=isZero?"방식을 생성하고 점수를 입력해 주세요.":(prettyText(row.settlement,state.names)||"방식을 생성하고 점수를 입력해 주세요.");
+  if(!row.settlement||isZero){
+    settleEl.innerHTML=`<div class="settle-empty">${settleText}</div>`;
+  }else{
+    const rawLines=prettyText(row.settlement,state.names).split('\n');
+    settleEl.innerHTML=rawLines.map(line=>{
+      if(line.includes(' : ')){
+        const [key,...rest]=line.split(' : ');
+        const items=rest.join(' : ').split('  |  ');
+        return `<div class="settle-line"><span class="settle-key">${key} :</span><span class="settle-val">${items.map(i=>`<span class="settle-item">${i}</span>`).join('')}</span></div>`;
+      }
+      return `<div class="settle-line" style="font-size:12px;color:#047857;font-weight:700">${line}</div>`;
+    }).join('');
+  }
   el.scoreGrid.innerHTML=PLAYERS.map(p=>{
     const f=row.flags[p];
     // 니어: par3 켜져있고, locked 아니고, 방식생성 됐을 때 활성
