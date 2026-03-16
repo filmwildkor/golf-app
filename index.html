@@ -65,6 +65,10 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
 .btn.disabledVisual{background:#9ca3af!important;color:#e5e7eb!important}
 .mini.disabledVisual{opacity:.35;background:#e5e7eb;color:#9ca3af;border-color:#e5e7eb}
 
+.autocomplete-wrap{position:relative}
+.autocomplete-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #d1d5db;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:999;max-height:200px;overflow-y:auto;margin-top:4px}
+.autocomplete-item{padding:10px 14px;font-size:13px;cursor:pointer;color:#111827;border-radius:8px}
+.autocomplete-item:hover{background:#f0fdf4;color:#047857;font-weight:700}
 </style>
 </head>
 <body>
@@ -87,8 +91,7 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
       <div class="block" style="margin-top:0"><div class="label">날짜</div><input id="dateInput" type="date"></div>
       <div class="block" style="margin-top:0"><div class="label">티오프</div><input id="timeInput" type="time"></div>
     </div>
-    <div class="block"><div class="label">골프장</div><input id="courseInput" placeholder="골프장"></div>
-    <div class="block"><div class="label">기준 판돈</div><input id="stakeInput" inputmode="numeric" placeholder="예: 20000"></div>
+<div class="block autocomplete-wrap"><div class="label">골프장</div><input id="courseInput" placeholder="골프장 이름 검색" autocomplete="off"><div class="autocomplete-list" id="courseList" style="display:none"></div></div>    <div class="block"><div class="label">기준 판돈</div><input id="stakeInput" inputmode="numeric" placeholder="예: 20000"></div>
     <div class="grid4" style="margin-top:6px">
       <input id="nameA" placeholder="A 이름"><input id="nameB" placeholder="B 이름">
       <input id="nameC" placeholder="C 이름"><input id="nameD" placeholder="D 이름">
@@ -460,6 +463,50 @@ document.getElementById("newRoundBtn").addEventListener("click",()=>{
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/golf-app/sw.js');
   }
+// ===== 골프장 자동완성 =====
+const GOLF_COURSES = ["360도","88CC","CLUBD 금강","J-PUBLIC","JNJ골프리조트","KA-CC","KBS빅토리아스타 컨트리클럽","KJ컨트리클럽","KY컨트리클럽","LK컨트리클럽","LT컨트리클럽","MJ컨트리클럽","OB컨트리클럽","OC컨트리클럽","OK컨트리클럽","OLC컨트리클럽","PK컨트리클럽","SG컨트리클럽","SK핀크스골프클럽","SKY72골프앤리조트","TK컨트리클럽","WJ컨트리클럽","가남컨트리클럽","가든컨트리클럽","가야컨트리클럽","가이아컨트리클럽","가평베네스트","갈산컨트리클럽","감악산CC","강릉라파엘CC","강릉컨트리클럽","강변컨트리클럽","강원도컨트리클럽","강진컨트리클럽","강촌엘리시안CC","강촌컨트리클럽","개나리컨트리클럽","개성컨트리클럽","거창컨트리클럽","경남컨트리클럽","경동컨트리클럽","경북컨트리클럽","경산컨트리클럽","경원컨트리클럽","경주동방CC","경주컨트리클럽","고려컨트리클럽","고성컨트리클럽","고양컨트리클럽","골드레이크CC","골든베이골프앤리조트","골든CC","공주컨트리클럽","과천컨트리클럽","관악컨트리클럽","광양컨트리클럽","광주컨트리클럽","광진컨트리클럽","구미컨트리클럽","구천동컨트리클럽","국제컨트리클럽","군산컨트리클럽","군위컨트리클럽","금강컨트리클럽","금오컨트리클럽","금정컨트리클럽","기장컨트리클럽","기흥컨트리클럽","김제컨트리클럽","김천컨트리클럽","김포컨트리클럽","김해컨트리클럽","나인브릿지","나주컨트리클럽","남서울컨트리클럽","남원컨트리클럽","남춘천CC","남해컨트리클럽","남해비치CC","남양CC","낙원컨트리클럽","내장산컨트리클럽","노블리제컨트리클럽","뉴서울컨트리클럽","뉴코리아컨트리클럽","다도해컨트리클럽","단양컨트리클럽","달성컨트리클럽","담양컨트리클럽","당진컨트리클럽","대광컨트리클럽","대구컨트리클럽","대둔산CC","대명비발디파크골프클럽","대보컨트리클럽","대성컨트리클럽","대원컨트리클럽","대전컨트리클럽","대청컨트리클럽","대천컨트리클럽","대한컨트리클럽","덕평컨트리클럽","도곡컨트리클럽","도봉컨트리클럽","동두천컨트리클럽","동래컨트리클럽","동부컨트리클럽","동서울컨트리클럽","동아컨트리클럽","동양컨트리클럽","동우컨트리클럽","동원컨트리클럽","동화컨트리클럽","드림파크CC","들꽃컨트리클럽","딘스뷰골프클럽","라데나골프클럽","라비에벨CC","라온골프클럽","래스트CC","레이크사이드CC","레이크힐스CC","렉스필드CC","로얄컨트리클럽","루나CC","마이다스컨트리클럽","마인드골프클럽","마제스티CC","망우컨트리클럽","매화CC","명성컨트리클럽","명지컨트리클럽","모아컨트리클럽","목포컨트리클럽","무등컨트리클럽","무안컨트리클럽","무주덕유산리조트","무주컨트리클럽","문경새재CC","문화컨트리클럽","미래컨트리클럽","밀양컨트리클럽","반도컨트리클럽","방주CC","배론컨트리클럽","백제컨트리클럽","버치힐골프클럽","베어크리크골프클럽","베어즈베스트청라","보광피닉스파크","보령컨트리클럽","보성컨트리클럽","보은컨트리클럽","봉황CC","부산컨트리클럽","부여컨트리클럽","부천컨트리클럽","북부산컨트리클럽","블루원상주CC","블루원성주CC","블루원용인CC","블루헤런CC","비봉컨트리클럽","비즈니스클럽","사우스스프링스CC","사이프러스CC","사천컨트리클럽","삼성컨트리클럽","삼양컨트리클럽","상당컨트리클럽","상주컨트리클럽","상화컨트리클럽","서귀포컨트리클럽","서산컨트리클럽","서울컨트리클럽","서원밸리CC","서해컨트리클럽","석수컨트리클럽","선산컨트리클럽","설악컨트리클럽","성남컨트리클럽","성산컨트리클럽","세종컨트리클럽","세종레이크CC","소노펠리체CC","소리컨트리클럽","속초컨트리클럽","솔모로컨트리클럽","솔브릿지CC","송추컨트리클럽","수도컨트리클럽","수안보컨트리클럽","수원컨트리클럽","숲속컨트리클럽","스카이72골프앤리조트","스카이밸리CC","스카이힐제주CC","스프링힐스CC","신원컨트리클럽","신지도CC","신평컨트리클럽","아난티CC","아덴힐CC","아산컨트리클럽","아시아드CC","아이리스CC","안동컨트리클럽","안면도CC","안성베네스트","안양베네스트","안양컨트리클럽","알펜시아골프파크","양산컨트리클럽","양지파인CC","에버리치CC","에이스컨트리클럽","에이원CC","엘리시안강촌CC","엘리시안제주CC","여수컨트리클럽","여주컨트리클럽","연천컨트리클럽","영광컨트리클럽","영덕컨트리클럽","영동컨트리클럽","영암컨트리클럽","영주컨트리클럽","영천컨트리클럽","예산컨트리클럽","예천컨트리클럽","오남컨트리클럽","오산컨트리클럽","오크밸리골프클럽","오크힐스CC","온양컨트리클럽","완주컨트리클럽","용인컨트리클럽","용평리조트골프클럽","우정힐스CC","웅상컨트리클럽","웰리힐리파크","원주컨트리클럽","원평컨트리클럽","월드컵CC","유성컨트리클럽","이스트밸리CC","이천컨트리클럽","이포컨트리클럽","익산컨트리클럽","일동레이크골프클럽","일산스프링힐스CC","잭니클라우스골프클럽코리아","전남컨트리클럽","전북컨트리클럽","전주컨트리클럽","정읍컨트리클럽","제이드팰리스CC","제일컨트리클럽","제주도립CC","제주세인트포골프앤리조트","제주컨트리클럽","제주파인힐스CC","조선컨트리클럽","종합컨트리클럽","주왕산CC","중부컨트리클럽","지산포레스트리조트","진도컨트리클럽","진안컨트리클럽","진주컨트리클럽","진천컨트리클럽","창녕컨트리클럽","창원컨트리클럽","천안컨트리클럽","청계컨트리클럽","청도컨트리클럽","청주컨트리클럽","청평컨트리클럽","초록빛컨트리클럽","춘천컨트리클럽","충남컨트리클럽","충북컨트리클럽","충청컨트리클럽","칠곡컨트리클럽","카멜리아힐CC","클럽72","클럽디아너스","클럽모우","클럽오렌지","태광CC","태안컨트리클럽","태인CC","태창컨트리클럽","통영컨트리클럽","파인CC","파인비치골프링크스","파인스CC","파인크리크CC","파인힐스CC","팔공컨트리클럽","포천컨트리클럽","포항컨트리클럽","풍기컨트리클럽","프리스틴밸리CC","핀크스골프클럽","하동컨트리클럽","하이스트컨트리클럽","하이원컨트리클럽","하이필드CC","하남컨트리클럽","한국컨트리클럽","한라산CC","한림광릉CC","한림안성","한양컨트리클럽","한화골프클럽경주","한화리조트설악CC","한화리조트제주CC","함안컨트리클럽","함양컨트리클럽","함평컨트리클럽","해남컨트리클럽","해비치컨트리클럽","해슬리나인브릿지","해운대컨트리클럽","행주컨트리클럽","헤리티지CC","홍천컨트리클럽","화산컨트리클럽","화성컨트리클럽","화순컨트리클럽","황룡컨트리클럽","횡성컨트리클럽","휘닉스스프링스","휘닉스제주CC"];
+
+function getChosung(str) {
+  const cho = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+  return [...str].map(c => {
+    const code = c.charCodeAt(0) - 0xAC00;
+    if (code < 0 || code > 11171) return c;
+    return cho[Math.floor(code / 588)];
+  }).join('');
+}
+
+function searchCourses(query) {
+  if (!query || !query.trim()) return [];
+  const q = query.trim();
+  const isChosung = /^[ㄱ-ㅎ]+$/.test(q);
+  return GOLF_COURSES.filter(name => {
+    if (isChosung) return getChosung(name).startsWith(q);
+    return name.includes(q);
+  }).slice(0, 8);
+}
+
+const courseInput = document.getElementById('courseInput');
+const courseList = document.getElementById('courseList');
+
+courseInput.addEventListener('input', function() {
+  const results = searchCourses(this.value);
+  if (results.length === 0) { courseList.style.display = 'none'; return; }
+  courseList.innerHTML = results.map(name =>
+    `<div class="autocomplete-item" onmousedown="selectCourse('${name.replace(/'/g, "\\'")}')">${name}</div>`
+  ).join('');
+  courseList.style.display = 'block';
+});
+
+courseInput.addEventListener('blur', function() {
+  setTimeout(() => { courseList.style.display = 'none'; }, 150);
+});
+
+function selectCourse(name) {
+  courseInput.value = name;
+  courseList.style.display = 'none';
+  render();
+}
+window.selectCourse = selectCourse;
 </script>
 </body>
 </html>
