@@ -665,8 +665,6 @@ document.getElementById("dateInput").addEventListener("input",render);
 document.getElementById("stakeInput").addEventListener("input",e=>{e.target.value=e.target.value.replace(/[^0-9]/g,"");render();});
 ["nameA","nameB","nameC","nameD"].forEach(id=>document.getElementById(id).addEventListener("input",render));
 document.getElementById("ddangRuleBtn").addEventListener("click",()=>{state.rules.ddangEnabled=!state.rules.ddangEnabled;recomputeRows();render();});
-document.getElementById("par3Btn").addEventListener("click",togglePar3);
-document.getElementById("lockToggleBtn").addEventListener("click",toggleLockCurrent);
 
 // 티오프 드럼롤
 (function(){
