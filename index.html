@@ -78,6 +78,15 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
 .drum-item{height:42px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#9ca3af;user-select:none;scroll-snap-align:center}
 .drum-item.selected{color:#111827;font-size:21px}
 #hourDrum::-webkit-scrollbar,#minDrum::-webkit-scrollbar,#handyDrum::-webkit-scrollbar{display:none}
+/* iOS 토글 스위치 */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:4px 2px}
+.toggle-label{font-size:12px;font-weight:700;color:#374151}
+.toggle-switch{position:relative;width:44px;height:26px;flex-shrink:0;cursor:pointer}
+.toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;border-radius:13px;background:#d1d5db;transition:background 0.2s}
+.toggle-track::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle-switch input:checked+.toggle-track{background:#10b981}
+.toggle-switch input:checked+.toggle-track::after{transform:translateX(18px)}
 </style>
 </head>
 <body>
@@ -163,9 +172,27 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
       </div>
     </div>
     <div class="block">
-      <div class="label">땡그랑</div>
-      <div style="display:flex;gap:6px;margin-top:4px">
-        <button class="mini" id="ddangRuleBtn" style="height:34px;font-size:11px">인정</button>
+      <div class="grid2" style="margin-top:0;gap:8px">
+        <div style="background:#f8fafc;border-radius:12px;padding:8px 10px;border:1px solid #e5e7eb">
+          <div class="toggle-row">
+            <span class="toggle-label">땡그랑</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="ddangToggle" onchange="toggleDdang()" checked>
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+          <div style="font-size:10px;color:#9ca3af;margin-top:2px">동타시 승부 결정</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:12px;padding:8px 10px;border:1px solid #e5e7eb">
+          <div class="toggle-row">
+            <span class="toggle-label">니어 승부</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="nearToggle" onchange="toggleNear()">
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+          <div style="font-size:10px;color:#9ca3af;margin-top:2px">PAR3 니어핀 내기</div>
+        </div>
       </div>
       <div class="label" style="margin-top:10px">핸디</div>
       <div class="handy-grid" id="handyGrid"></div>
@@ -268,6 +295,7 @@ function emptyFlags(){return {near:false,ddang:false,ok:false};}
 function makeRows(){return Array.from({length:18},(_,i)=>({hole:i+1,mode:"미정",team:"",A:"",B:"",C:"",D:"",locked:false,par3:false,carryIn:0,appliedPot:0,winner:"",settlement:"",flags:{A:emptyFlags(),B:emptyFlags(),C:emptyFlags(),D:emptyFlags()}}));}
 function parseStake(v){const n=Number(String(v||"").replace(/[^0-9]/g,""));return Number.isFinite(n)?n:0;}
 function money(v){return `${Math.round(v||0).toLocaleString("ko-KR")}원`;}
+function jang(v){const n=Math.round(v||0);return n%10000===0?`${n/10000}장`:`${n.toLocaleString("ko-KR")}원`;}
 function displayName(names,p){return names[p]||p;}
 function prettyText(text,names){if(!text)return "";return String(text).replace(/[ABCD]/g,m=>names[m]||m);}
 function score(v){if(v===""||v==null)return null;const n=Number(v);return Number.isFinite(n)?n:null;}
@@ -395,24 +423,26 @@ function recomputeRows(){
     const lines=[];const pot=row.appliedPot;
     if(row.mode==="개인전"){
       const ranked=[...PLAYERS].sort((a,b)=>compareRank(a,b,row));
-      lines.push(ranked.slice(1).map(p=>`${displayName(state.names,p)} -${money(pot)}`).join("  "));
+      lines.push("정산 : "+ranked.slice(1).map(p=>`${displayName(state.names,p)} ${jang(pot)}`).join("  "));
     }else if(row.mode==="2:2"){
       const [left,right]=row.team.split(" vs ");
       const losers=(winner===left?right:left).split("+");
-      lines.push(losers.map(p=>`${displayName(state.names,p)} -${money(pot)}`).join("  "));
+      lines.push("정산 : "+losers.map(p=>`${displayName(state.names,p)} ${jang(pot)}`).join("  "));
     }else if(row.mode==="1:3"){
       const calc=get13Calc(row);
       if(winner===calc.solo){
         const trio=row.team.split(" vs ")[1].split("+");
-        lines.push(trio.map(p=>`${displayName(state.names,p)} -${money(pot)}`).join("  "));
+        lines.push("정산 : "+trio.map(p=>`${displayName(state.names,p)} ${jang(pot)}`).join("  "));
       }else{
-        lines.push(`${displayName(state.names,calc.solo)} -${money(pot*3)}`);
+        lines.push(`정산 : ${displayName(state.names,calc.solo)} ${jang(pot*3)}`);
       }
     }
-    if(row.par3){
+    if(row.par3&&state.rules.nearEnabled){
       const nearWinner=PLAYERS.find(p=>row.flags[p].near);
       if(nearWinner){
-        lines.push(`니어: `+PLAYERS.filter(p=>p!==nearWinner).map(p=>`${displayName(state.names,p)} -${money(10000)}`).join("  "));
+        lines.push("니어 : "+PLAYERS.filter(p=>p!==nearWinner).map(p=>`${displayName(state.names,p)} ${jang(10000)}`).join("  "));
+      }else{
+        lines.push("니어 : 미결정");
       }
     }
     row.settlement=lines.join("\n");carry=0;
@@ -426,7 +456,7 @@ function calcTotals(){
     if(row.mode==="개인전"){const ranked=[...PLAYERS].sort((a,b)=>compareRank(a,b,row));ranked.slice(1).forEach(p=>out[p]+=pot);}
     else if(row.mode==="2:2"){const [left,right]=row.team.split(" vs ");(row.winner===left?right:left).split("+").forEach(p=>out[p]+=pot);}
     else if(row.mode==="1:3"){const calc=get13Calc(row);if(row.winner===calc.solo){row.team.split(" vs ")[1].split("+").forEach(p=>out[p]+=pot);}else{out[calc.solo]+=pot*3;}}
-    if(row.par3){const nw=PLAYERS.find(p=>row.flags[p].near);if(nw){PLAYERS.filter(p=>p!==nw).forEach(p=>out[p]+=10000);}}
+    if(row.par3&&state.rules.nearEnabled){const nw=PLAYERS.find(p=>row.flags[p].near);if(nw){PLAYERS.filter(p=>p!==nw).forEach(p=>out[p]+=10000);}}
   });
   return out;
 }
@@ -434,7 +464,7 @@ function calcTotals(){
 let state={
   meta:{course:"",date:"",time:"",stake:""},
   names:{A:"",B:"",C:"",D:""},
-  rules:{ddangEnabled:true},
+  rules:{ddangEnabled:true, nearEnabled:false},
   handy:{A:0,B:0,C:0,D:0},
   ratio:{mode:'even',solo:33,r22:33,r13:34},
   settingLocked:false,
@@ -636,7 +666,7 @@ function render(){
     // 니어: par3 켜져있고, locked 아니고, 방식생성 됐을 때 활성
     // 다른 사람이 이미 니어 선택했으면 나머지는 비활성
     const nearActive=f.near;
-    const nearDisabled=row.locked||isZero||!row.par3||(!!nearOwner&&nearOwner!==p);
+    const nearDisabled=row.locked||isZero||!row.par3||!state.rules.nearEnabled||(!!nearOwner&&nearOwner!==p);
     const ddangDisabled=row.locked||isZero||ddangOff;
     return `<div class="scoreBox">
       <div class="scoreName">${displayName(state.names,p)}</div>
@@ -664,7 +694,10 @@ document.getElementById("courseInput").addEventListener("input",render);
 document.getElementById("dateInput").addEventListener("input",render);
 document.getElementById("stakeInput").addEventListener("input",e=>{e.target.value=e.target.value.replace(/[^0-9]/g,"");render();});
 ["nameA","nameB","nameC","nameD"].forEach(id=>document.getElementById(id).addEventListener("input",render));
-document.getElementById("ddangRuleBtn").addEventListener("click",()=>{state.rules.ddangEnabled=!state.rules.ddangEnabled;recomputeRows();render();});
+document.getElementById("ddangRuleBtn")&&document.getElementById("ddangRuleBtn").addEventListener("click",()=>{state.rules.ddangEnabled=!state.rules.ddangEnabled;recomputeRows();render();});
+function toggleDdang(){state.rules.ddangEnabled=document.getElementById('ddangToggle').checked;recomputeRows();render();}
+function toggleNear(){state.rules.nearEnabled=document.getElementById('nearToggle').checked;if(!state.rules.nearEnabled){state.rows.forEach(r=>PLAYERS.forEach(p=>r.flags[p].near=false));}recomputeRows();render();}
+window.toggleDdang=toggleDdang;window.toggleNear=toggleNear;
 
 // 티오프 드럼롤
 (function(){
