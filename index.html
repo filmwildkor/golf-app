@@ -10,91 +10,128 @@
 <meta name="apple-mobile-web-app-title" content="골프내기" />
 <title>골프 내기 기록</title>
 <style>
-:root{--bg1:#1f6b47;--bg2:#174d35;--bg3:#0f2d22;--line:#e5e7eb;--text:#111827;--muted:#6b7280}
+/*
+  타이포그래피 시스템
+  --t-section : 섹션 헤더 (세팅, 현재홀 등)   14px 900
+  --t-label   : 블록 레이블 (날짜, 판돈 등)    13px 700
+  --t-body    : 입력/버튼 텍스트               13px 400~800
+  --t-btn     : 작은 버튼 (mini, 방식비율 등)  12px 800
+  --t-tag     : 태그/배지                      11px 700
+  --t-caption : 보조 설명                      11px 400
+*/
+:root{
+  --bg1:#1f6b47;--bg2:#174d35;--bg3:#0f2d22;
+  --line:#e5e7eb;--text:#111827;--muted:#6b7280;
+  --green:#10b981;--green-dk:#047857;--green-lt:#f0fdf4;--green-bd:#bbf7d0;
+}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at top,var(--bg1) 0%,var(--bg2) 42%,var(--bg3) 100%);min-height:100vh}
-.wrap{max-width:430px;margin:0 auto;padding:8px 8px 18px}
-.card{background:rgba(255,255,255,.94);border-radius:24px;box-shadow:0 18px 34px rgba(0,0,0,.18);overflow:hidden;margin-top:8px}
+.wrap{max-width:430px;margin:0 auto;padding:8px 8px 20px}
+
+/* 카드 공통 */
+.card,.setting-panel{background:rgba(255,255,255,.96);border-radius:22px;box-shadow:0 16px 32px rgba(0,0,0,.14);overflow:hidden;margin-top:8px}
 
 /* 세팅 패널 */
-.setting-panel{background:rgba(255,255,255,.94);border-radius:24px;box-shadow:0 18px 34px rgba(0,0,0,.18);margin-top:8px;overflow:hidden;transition:opacity 0.3s}
 .setting-panel.locked{opacity:0.6}
 .setting-panel.locked .setting-body{pointer-events:none}
-.setting-header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px 10px}
-.setting-title{font-size:13px;font-weight:900;color:#047857}
-.setting-lock-btn{height:30px;border-radius:10px;border:1px solid #d1d5db;background:#fff;font-size:10px;font-weight:900;color:#475569;cursor:pointer;padding:0 12px;user-select:none}
+.setting-header{display:flex;justify-content:space-between;align-items:center;padding:14px 14px 10px}
+.setting-title{font-size:14px;font-weight:900;color:var(--green-dk)}
+.setting-lock-btn{height:32px;border-radius:10px;border:1px solid #d1d5db;background:#fff;font-size:12px;font-weight:800;color:#475569;cursor:pointer;padding:0 14px}
 .setting-lock-btn.locked{background:#111827;color:#fff;border-color:#111827}
-.setting-body{padding:0 10px 12px}
+.setting-body{padding:0 12px 14px}
 
+/* 레이아웃 */
 .grid2{display:grid;gap:6px;grid-template-columns:1fr 1fr}
-input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);padding:0 12px;font-size:13px;background:#fff;color:var(--text);outline:none}
-.block{background:#f8fafc;border-radius:16px;padding:10px;border:1px solid #e5e7eb;margin-top:6px}
-/* 서브 헤드 레이블 — 3pt 크게, 볼드 */
-.label{font-size:13px;font-weight:700;color:#374151;margin:0 0 6px 2px}
-.head{padding:12px;border-bottom:1px solid #f1f5f9;display:flex;flex-direction:column;gap:8px}
-.hole{font-size:28px;font-weight:900;line-height:1}
-.inner{padding:12px}
-.btn{height:40px;border:none;border-radius:16px;padding:0 10px;font-size:12px;font-weight:800;cursor:pointer}
-.btn.primary{background:#10b981;color:#fff}
-.btn:disabled,.mini:disabled,.step:disabled{opacity:.42;cursor:not-allowed}
-.roundToggles,.flagToggles{display:flex;gap:6px;margin-top:6px}
-.mini{flex:1;height:30px;border-radius:12px;border:1px solid #d1d5db;background:#fff;font-size:10px;font-weight:800;color:#475569;cursor:pointer}
+.grid4{display:grid;gap:4px;grid-template-columns:1fr 1fr 1fr 1fr}
+
+/* 블록 */
+.block{background:#f8fafc;border-radius:16px;padding:12px;border:1px solid #e5e7eb;margin-top:8px}
+
+/* 타이포 */
+.label{font-size:13px;font-weight:700;color:#374151;margin:0 0 8px 0;display:block}
+.caption{font-size:11px;color:var(--muted)}
+
+/* 입력 */
+input[type=text],input[type=date],input[type=number],input[type=tel]{width:100%;height:42px;border-radius:14px;border:1px solid var(--line);padding:0 12px;font-size:14px;background:#fff;color:var(--text);outline:none}
+
+/* 작은 토글 버튼 (미니) */
+.mini{flex:1;height:34px;border-radius:12px;border:1px solid #d1d5db;background:#fff;font-size:12px;font-weight:800;color:#475569;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0 6px}
 .mini.active{background:#111827;color:#fff;border-color:#111827}
-.scoreGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
-.scoreBox{border:1px solid #e5e7eb;border-radius:18px;background:#fafaf9;padding:8px}
-.scoreName{font-size:11px;font-weight:700;color:#6b7280;margin-bottom:6px}
-.stepRow{display:grid;grid-template-columns:34px 1fr 34px;gap:6px;align-items:center}
-.step{height:36px;border-radius:14px;border:1px solid #d1d5db;background:#fff;font-size:18px;font-weight:900;color:#374151;cursor:pointer}
-.scoreVal{height:36px;border-radius:14px;background:#fff;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#111827}
-.settle{border:1px solid #d1fae5;background:linear-gradient(90deg,#ecfdf5,#f7fee7);border-radius:20px;padding:11px;margin-top:8px}
-.settle .k{font-size:10px;font-weight:700;color:#047857}.settle .v{font-size:15px;font-weight:900;line-height:1.35;color:#064e3b;margin-top:4px;white-space:pre-line}
-.holesWrap{margin-top:8px}.holes{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
-.holeBtn{height:36px;border-radius:14px;border:1px solid #e5e7eb;background:#fff;font-size:11px;font-weight:900;color:#374151;cursor:pointer}
-.holeBtn.active{background:#047857;color:#fff;border-color:#047857}.holeBtn.done{background:#ecfdf5;color:#047857;border-color:#bbf7d0}
+.mini:disabled{opacity:.42;cursor:not-allowed}
+
+/* 스코어 영역 */
+.head{padding:14px;border-bottom:1px solid #f1f5f9;display:flex;flex-direction:column;gap:8px}
+.hole{font-size:30px;font-weight:900;line-height:1;color:#111827}
+.inner{padding:14px}
+.scoreGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.scoreBox{border:1px solid #e5e7eb;border-radius:18px;background:#fafaf9;padding:10px}
+.scoreName{font-size:13px;font-weight:700;color:#475569;margin-bottom:8px;text-align:center}
+.stepRow{display:grid;grid-template-columns:38px 1fr 38px;gap:6px;align-items:center}
+.step{height:38px;border-radius:14px;border:1px solid #d1d5db;background:#fff;font-size:20px;font-weight:900;color:#374151;cursor:pointer}
+.step:disabled{opacity:.42;cursor:not-allowed}
+.scoreVal{height:38px;border-radius:14px;background:#fff;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#111827}
+.flagToggles{display:flex;gap:4px;margin-top:8px}
+
+/* 정산 */
+.settle{border:1px solid var(--green-bd);background:var(--green-lt);border-radius:18px;padding:12px;margin-top:10px}
+.settle-text{font-size:14px;font-weight:800;line-height:1.5;color:#064e3b;white-space:pre-line}
+
+/* 홀 이동 */
+.holesWrap{margin-top:10px}
+.holes{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:6px}
+.holeBtn{height:38px;border-radius:12px;border:1px solid #e5e7eb;background:#fff;font-size:12px;font-weight:900;color:#374151;cursor:pointer}
+.holeBtn.active{background:#047857;color:#fff;border-color:#047857}
+.holeBtn.done{background:#ecfdf5;color:#047857;border-color:var(--green-bd)}
+
+/* 누적 */
 .totals{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
-.total{background:rgba(255,255,255,.94);border-radius:18px;padding:10px;box-shadow:0 10px 24px rgba(0,0,0,.12)}
-.total .cap{font-size:10px;color:var(--muted)}.total .name{font-size:12px;font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.total .money{font-size:18px;font-weight:900;margin-top:3px;color:#e11d48}
-.btn.disabledVisual{background:#9ca3af!important;color:#e5e7eb!important}
-.mini.disabledVisual{opacity:.35;background:#e5e7eb;color:#9ca3af;border-color:#e5e7eb}
+.total{background:rgba(255,255,255,.96);border-radius:18px;padding:12px;box-shadow:0 8px 20px rgba(0,0,0,.10)}
+.total .t-cap{font-size:11px;color:var(--muted);font-weight:600}
+.total .t-name{font-size:13px;font-weight:800;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#374151}
+.total .t-money{font-size:20px;font-weight:900;margin-top:3px;color:#e11d48}
+
+/* 핸디 */
+.handy-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;margin-top:8px}
+.handy-btn{height:40px;border-radius:14px;border:1px solid #e5e7eb;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:0 8px;width:100%}
+.handy-btn .hname{font-size:12px;color:#6b7280;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+.handy-btn .hval{font-size:14px;font-weight:900;color:var(--green-dk);background:#dcfce7;border-radius:8px;padding:2px 8px;flex-shrink:0}
+
+/* 자동완성 */
 .autocomplete-wrap{position:relative}
 .autocomplete-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #d1d5db;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:999;max-height:200px;overflow-y:auto;margin-top:4px}
-.autocomplete-item{padding:10px 14px;font-size:13px;cursor:pointer;color:#111827;border-radius:8px}
-.autocomplete-item:hover{background:#f0fdf4;color:#047857;font-weight:700}
+.autocomplete-item{padding:12px 14px;font-size:14px;cursor:pointer;color:#111827}
+.autocomplete-item:hover{background:#f0fdf4;color:var(--green-dk);font-weight:700}
+
+/* 드럼롤 */
 .drum-item{height:42px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#9ca3af;user-select:none;scroll-snap-align:center}
 .drum-item.selected{color:#111827;font-size:21px}
 #hourDrum::-webkit-scrollbar,#minDrum::-webkit-scrollbar,#handyDrum::-webkit-scrollbar{display:none}
-.handy-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;margin-top:6px}
-.handy-btn{height:38px;border-radius:14px;border:1px solid #e5e7eb;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:0 8px;width:100%}
-.handy-btn .hname{font-size:11px;color:#6b7280;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.handy-btn .hval{font-size:13px;font-weight:900;color:#047857;background:#dcfce7;border-radius:8px;padding:2px 6px;flex-shrink:0}
-.grid4names{display:grid;gap:4px;grid-template-columns:1fr 1fr 1fr 1fr;margin-top:6px}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <!-- 팝업들 -->
+  <!-- 티오프 팝업 -->
   <div id="timePickerOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-end;justify-content:center">
     <div style="background:#fff;border-radius:24px 24px 0 0;padding:20px;width:100%;max-width:430px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <button onclick="closeTimePicker()" style="background:none;border:none;font-size:14px;color:#6b7280;cursor:pointer;font-weight:800;padding:4px 8px">취소</button>
-        <span style="font-size:15px;font-weight:900;color:#111827">티오프 시간</span>
-        <button onclick="confirmTimePicker()" style="background:none;border:none;font-size:14px;color:#10b981;cursor:pointer;font-weight:900;padding:4px 8px">확인 ✓</button>
+        <button onclick="closeTimePicker()" style="background:none;border:none;font-size:15px;color:#6b7280;cursor:pointer;font-weight:800">취소</button>
+        <span style="font-size:16px;font-weight:900;color:#111827">티오프 시간</span>
+        <button onclick="confirmTimePicker()" style="background:none;border:none;font-size:15px;color:var(--green);cursor:pointer;font-weight:900">확인 ✓</button>
       </div>
       <div style="display:flex;align-items:center;justify-content:center;gap:10px">
         <div style="flex:1;position:relative;height:150px;overflow:hidden;border:1px solid #e5e7eb;border-radius:16px;background:#f8fafc">
           <div style="position:absolute;top:0;left:0;right:0;height:48px;background:linear-gradient(to bottom,#f8fafc,transparent);z-index:2;pointer-events:none"></div>
           <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(to top,#f8fafc,transparent);z-index:2;pointer-events:none"></div>
-          <div style="position:absolute;top:50%;left:0;right:0;height:42px;transform:translateY(-50%);border-top:2px solid #10b981;border-bottom:2px solid #10b981;z-index:1;pointer-events:none"></div>
+          <div style="position:absolute;top:50%;left:0;right:0;height:42px;transform:translateY(-50%);border-top:2px solid var(--green);border-bottom:2px solid var(--green);z-index:1;pointer-events:none"></div>
           <div id="hourDrum" style="overflow-y:scroll;height:150px;scrollbar-width:none;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch"></div>
         </div>
         <span style="font-size:28px;font-weight:900;color:#374151;flex-shrink:0">:</span>
         <div style="flex:1;position:relative;height:150px;overflow:hidden;border:1px solid #e5e7eb;border-radius:16px;background:#f8fafc">
           <div style="position:absolute;top:0;left:0;right:0;height:48px;background:linear-gradient(to bottom,#f8fafc,transparent);z-index:2;pointer-events:none"></div>
           <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(to top,#f8fafc,transparent);z-index:2;pointer-events:none"></div>
-          <div style="position:absolute;top:50%;left:0;right:0;height:42px;transform:translateY(-50%);border-top:2px solid #10b981;border-bottom:2px solid #10b981;z-index:1;pointer-events:none"></div>
+          <div style="position:absolute;top:50%;left:0;right:0;height:42px;transform:translateY(-50%);border-top:2px solid var(--green);border-bottom:2px solid var(--green);z-index:1;pointer-events:none"></div>
           <div id="minDrum" style="overflow-y:scroll;height:150px;scrollbar-width:none;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch"></div>
         </div>
       </div>
@@ -102,22 +139,23 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
     </div>
   </div>
 
+  <!-- 핸디 팝업 -->
   <div id="handyPickerOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-end;justify-content:center">
     <div style="background:#fff;border-radius:24px 24px 0 0;padding:20px;width:100%;max-width:430px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <button onclick="closeHandyPicker()" style="background:none;border:none;font-size:14px;color:#6b7280;cursor:pointer;font-weight:800;padding:4px 8px">취소</button>
-        <span style="font-size:15px;font-weight:900;color:#111827" id="handyPickerTitle">핸디</span>
-        <button onclick="confirmHandyPicker()" style="background:none;border:none;font-size:14px;color:#10b981;cursor:pointer;font-weight:900;padding:4px 8px">확인 ✓</button>
+        <button onclick="closeHandyPicker()" style="background:none;border:none;font-size:15px;color:#6b7280;cursor:pointer;font-weight:800">취소</button>
+        <span style="font-size:16px;font-weight:900;color:#111827" id="handyPickerTitle">핸디</span>
+        <button onclick="confirmHandyPicker()" style="background:none;border:none;font-size:15px;color:var(--green);cursor:pointer;font-weight:900">확인 ✓</button>
       </div>
       <div style="display:flex;justify-content:center">
         <div style="width:140px;position:relative;height:150px;overflow:hidden;border:1px solid #e5e7eb;border-radius:16px;background:#f8fafc">
           <div style="position:absolute;top:0;left:0;right:0;height:48px;background:linear-gradient(to bottom,#f8fafc,transparent);z-index:2;pointer-events:none"></div>
           <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(to top,#f8fafc,transparent);z-index:2;pointer-events:none"></div>
-          <div style="position:absolute;top:50%;left:0;right:0;height:42px;transform:translateY(-50%);border-top:2px solid #10b981;border-bottom:2px solid #10b981;z-index:1;pointer-events:none"></div>
+          <div style="position:absolute;top:50%;left:0;right:0;height:42px;transform:translateY(-50%);border-top:2px solid var(--green);border-bottom:2px solid var(--green);z-index:1;pointer-events:none"></div>
           <div id="handyDrum" style="overflow-y:scroll;height:150px;scrollbar-width:none;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch"></div>
         </div>
       </div>
-      <div style="text-align:center;margin-top:14px;font-size:24px;font-weight:900;color:#047857" id="handyDisplay">0</div>
+      <div style="text-align:center;margin-top:14px;font-size:24px;font-weight:900;color:var(--green-dk)" id="handyDisplay">0</div>
     </div>
   </div>
 
@@ -128,68 +166,75 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
       <button class="setting-lock-btn" id="settingLockBtn" onclick="toggleSettingLock()">잠금</button>
     </div>
     <div class="setting-body">
+
       <div class="grid2">
-        <div class="block" style="margin-top:0"><div class="label">날짜</div><input id="dateInput" type="date"></div>
         <div class="block" style="margin-top:0">
-          <div class="label">티오프</div>
-          <input id="timeInput" type="text" readonly placeholder="시간 선택 ▾" onclick="openTimePicker()" style="cursor:pointer;caret-color:transparent;background:#fff;font-weight:800;color:#111827"/>
+          <span class="label">날짜</span>
+          <input id="dateInput" type="date">
+        </div>
+        <div class="block" style="margin-top:0">
+          <span class="label">티오프</span>
+          <input id="timeInput" type="text" readonly placeholder="시간 선택 ▾" onclick="openTimePicker()" style="cursor:pointer;caret-color:transparent;font-weight:800;color:#111827"/>
         </div>
       </div>
+
       <div class="block autocomplete-wrap">
-        <div class="label">골프장</div>
-        <input id="courseInput" placeholder="골프장 이름 검색" autocomplete="off">
+        <span class="label">골프장</span>
+        <input id="courseInput" placeholder="골프장 이름 검색" autocomplete="off" style="font-size:14px">
         <div class="autocomplete-list" id="courseList" style="display:none"></div>
       </div>
+
       <div class="block">
-        <div class="label">판돈</div>
-        <input id="stakeInput" inputmode="numeric" placeholder="예: 20000">
+        <span class="label">판돈</span>
+        <input id="stakeInput" inputmode="numeric" placeholder="예: 20000" style="font-size:14px">
       </div>
+
       <div class="block">
-        <div class="label">오늘의 선수</div>
-        <div class="grid4names">
-          <input id="nameA" placeholder="A" style="padding:0 6px;font-size:13px;text-align:center">
-          <input id="nameB" placeholder="B" style="padding:0 6px;font-size:13px;text-align:center">
-          <input id="nameC" placeholder="C" style="padding:0 6px;font-size:13px;text-align:center">
-          <input id="nameD" placeholder="D" style="padding:0 6px;font-size:13px;text-align:center">
+        <span class="label">오늘의 선수</span>
+        <div class="grid4">
+          <input id="nameA" placeholder="A" style="text-align:center;font-size:14px;font-weight:700">
+          <input id="nameB" placeholder="B" style="text-align:center;font-size:14px;font-weight:700">
+          <input id="nameC" placeholder="C" style="text-align:center;font-size:14px;font-weight:700">
+          <input id="nameD" placeholder="D" style="text-align:center;font-size:14px;font-weight:700">
         </div>
       </div>
+
       <div class="block">
-        <div class="label">땡그랑</div>
-        <div class="roundToggles" style="margin-top:0">
-          <button class="mini" id="ddangRuleBtn">인정</button>
+        <span class="label">땡그랑</span>
+        <div style="display:flex;gap:6px">
+          <button class="mini" id="ddangRuleBtn" style="height:38px;font-size:13px">인정</button>
         </div>
-        <div style="margin-top:12px">
-          <div class="label">핸디</div>
-          <div class="handy-grid" id="handyGrid"></div>
+
+        <span class="label" style="margin-top:14px">핸디</span>
+        <div class="handy-grid" id="handyGrid"></div>
+
+        <span class="label" style="margin-top:14px">방식 비율</span>
+        <div style="display:flex;gap:4px">
+          <button class="mini active" id="ratio-even" onclick="setRatio('even')">균등</button>
+          <button class="mini" id="ratio-random" onclick="setRatio('random')">완전랜덤</button>
+          <button class="mini" id="ratio-solo" onclick="setRatio('solo')">개인전 위주</button>
+          <button class="mini" id="ratio-22" onclick="setRatio('22')">2vs2 위주</button>
+          <button class="mini" id="ratio-13" onclick="setRatio('13')">1vs3 위주</button>
         </div>
-        <div style="margin-top:12px">
-          <div class="label">방식 비율</div>
-          <div style="display:flex;gap:4px;margin-top:6px" id="ratioGrid">
-            <button class="mini active" id="ratio-random" onclick="setRatio('random')" style="font-size:9px">완전랜덤</button>
-            <button class="mini" id="ratio-even" onclick="setRatio('even')" style="font-size:9px">균등</button>
-            <button class="mini" id="ratio-solo" onclick="setRatio('solo')" style="font-size:9px">개인전 위주</button>
-            <button class="mini" id="ratio-22" onclick="setRatio('22')" style="font-size:9px">2vs2 위주</button>
-            <button class="mini" id="ratio-13" onclick="setRatio('13')" style="font-size:9px">1vs3 위주</button>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:12px;font-weight:800;color:#6b7280;width:56px;flex-shrink:0">개인전</span>
+            <input type="range" id="sliderSolo" min="0" max="100" value="33" oninput="updateCustomRatio('solo')" style="flex:1;accent-color:var(--green)">
+            <span style="font-size:13px;font-weight:900;color:#111827;width:36px;text-align:right" id="valSolo">33%</span>
           </div>
-          <div style="margin-top:10px;display:flex;flex-direction:column;gap:10px">
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-size:11px;font-weight:800;color:#6b7280;width:52px;flex-shrink:0">개인전</span>
-              <input type="range" id="sliderSolo" min="0" max="100" value="33" oninput="updateCustomRatio('solo')" style="flex:1;accent-color:#10b981">
-              <span style="font-size:12px;font-weight:900;color:#111827;width:34px;text-align:right" id="valSolo">33%</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-size:11px;font-weight:800;color:#6b7280;width:52px;flex-shrink:0">2vs2</span>
-              <input type="range" id="slider22" min="0" max="100" value="33" oninput="updateCustomRatio('22')" style="flex:1;accent-color:#10b981">
-              <span style="font-size:12px;font-weight:900;color:#111827;width:34px;text-align:right" id="val22">33%</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-size:11px;font-weight:800;color:#6b7280;width:52px;flex-shrink:0">1vs3</span>
-              <input type="range" id="slider13" min="0" max="100" value="34" oninput="updateCustomRatio('13')" style="flex:1;accent-color:#10b981">
-              <span style="font-size:12px;font-weight:900;color:#111827;width:34px;text-align:right" id="val13">34%</span>
-            </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:12px;font-weight:800;color:#6b7280;width:56px;flex-shrink:0">2vs2</span>
+            <input type="range" id="slider22" min="0" max="100" value="33" oninput="updateCustomRatio('22')" style="flex:1;accent-color:var(--green)">
+            <span style="font-size:13px;font-weight:900;color:#111827;width:36px;text-align:right" id="val22">33%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:12px;font-weight:800;color:#6b7280;width:56px;flex-shrink:0">1vs3</span>
+            <input type="range" id="slider13" min="0" max="100" value="34" oninput="updateCustomRatio('13')" style="flex:1;accent-color:var(--green)">
+            <span style="font-size:13px;font-weight:900;color:#111827;width:36px;text-align:right" id="val13">34%</span>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -199,39 +244,41 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
       <div style="display:flex;gap:6px;align-items:center">
         <div class="hole" id="holeText">1</div>
         <div style="display:flex;gap:5px;flex:1;min-width:0">
-          <button id="spinBtn" onclick="spinCurrentMode()" style="width:100px;flex-shrink:0;height:40px;border-radius:12px;border:none;background:#10b981;cursor:pointer;overflow:hidden;position:relative;padding:0">
+          <button id="spinBtn" onclick="spinCurrentMode()" style="width:106px;flex-shrink:0;height:42px;border-radius:12px;border:none;background:var(--green);cursor:pointer;overflow:hidden;position:relative;padding:0">
             <div style="position:absolute;top:0;left:0;right:0;height:10px;background:linear-gradient(to bottom,rgba(0,0,0,0.15),transparent);z-index:2;pointer-events:none"></div>
             <div style="position:absolute;bottom:0;left:0;right:0;height:10px;background:linear-gradient(to top,rgba(0,0,0,0.15),transparent);z-index:2;pointer-events:none"></div>
             <div id="spinSlot" style="display:flex;flex-direction:column;will-change:transform">
-              <div style="height:40px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;letter-spacing:0.3px">🎰 방식생성</div>
+              <div style="height:42px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;letter-spacing:0.3px">🎰 방식생성</div>
             </div>
           </button>
-          <button id="par3Btn" onclick="togglePar3()" style="width:48px;height:40px;border-radius:12px;border:1px solid #e5e7eb;background:#f8fafc;font-size:10px;font-weight:900;color:#475569;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">PAR3</button>
-          <button id="lockToggleBtn" onclick="toggleLockCurrent()" style="width:48px;height:40px;border-radius:12px;border:1px solid #e5e7eb;background:#f8fafc;font-size:10px;font-weight:900;color:#475569;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">LOCK</button>
+          <button id="par3Btn" onclick="togglePar3()" style="flex:1;height:42px;border-radius:12px;border:1px solid #e5e7eb;background:#f8fafc;font-size:12px;font-weight:900;color:#475569;cursor:pointer;display:flex;align-items:center;justify-content:center">PAR3</button>
+          <button id="lockToggleBtn" onclick="toggleLockCurrent()" style="flex:1;height:42px;border-radius:12px;border:1px solid #e5e7eb;background:#f8fafc;font-size:12px;font-weight:900;color:#475569;cursor:pointer;display:flex;align-items:center;justify-content:center">LOCK</button>
         </div>
-        <div style="flex-shrink:0;min-width:80px;height:40px;display:flex;align-items:center;justify-content:flex-end">
+        <div style="flex-shrink:0;min-width:82px;height:42px;display:flex;align-items:center;justify-content:flex-end">
           <div id="potText" style="font-size:22px;font-weight:900;color:#d97706;white-space:nowrap">0원</div>
         </div>
       </div>
-      <div id="teamBox" style="background:#f8fafc;border-radius:12px;height:40px;display:flex;align-items:center;justify-content:center;border:1px solid #e5e7eb">
-        <div id="teamText" style="font-size:13px;font-weight:900;color:#9ca3af;letter-spacing:0.3px;line-height:1">방식을 생성해주세요</div>
+      <div id="teamBox" style="background:#f8fafc;border-radius:12px;height:42px;display:flex;align-items:center;justify-content:center;border:1px solid #e5e7eb">
+        <div id="teamText" style="font-size:14px;font-weight:900;color:#9ca3af;letter-spacing:0.2px;line-height:1">방식을 생성해주세요</div>
       </div>
     </div>
     <div class="inner">
       <div class="scoreGrid" id="scoreGrid"></div>
-      <div class="settle"><div class="k">자동 정산</div><div class="v" id="settlementText">방식을 생성하고 점수를 입력해 주세요.</div></div>
+      <div class="settle" id="settleBox">
+        <div class="settle-text" id="settlementText">방식을 생성하고 점수를 입력해 주세요.</div>
+      </div>
       <div class="holesWrap">
-        <div style="font-size:10px;font-weight:700;color:#6b7280;margin-bottom:6px">홀 이동</div>
+        <span class="label" style="margin-bottom:0">홀 이동</span>
         <div class="holes" id="holesGrid"></div>
       </div>
     </div>
   </div>
 
   <div class="totals">
-    <div class="total"><div class="cap">누적 지출</div><div class="name" id="totalNameA">A</div><div class="money" id="totalA">-0원</div></div>
-    <div class="total"><div class="cap">누적 지출</div><div class="name" id="totalNameB">B</div><div class="money" id="totalB">-0원</div></div>
-    <div class="total"><div class="cap">누적 지출</div><div class="name" id="totalNameC">C</div><div class="money" id="totalC">-0원</div></div>
-    <div class="total"><div class="cap">누적 지출</div><div class="name" id="totalNameD">D</div><div class="money" id="totalD">-0원</div></div>
+    <div class="total"><div class="t-cap">누적 지출</div><div class="t-name" id="totalNameA">A</div><div class="t-money" id="totalA">-0원</div></div>
+    <div class="total"><div class="t-cap">누적 지출</div><div class="t-name" id="totalNameB">B</div><div class="t-money" id="totalB">-0원</div></div>
+    <div class="total"><div class="t-cap">누적 지출</div><div class="t-name" id="totalNameC">C</div><div class="t-money" id="totalC">-0원</div></div>
+    <div class="total"><div class="t-cap">누적 지출</div><div class="t-name" id="totalNameD">D</div><div class="t-money" id="totalD">-0원</div></div>
   </div>
 </div>
 
@@ -248,6 +295,13 @@ const MODES=[
   {mode:"1:3",team:"C vs A+B+D"},
   {mode:"1:3",team:"D vs A+B+C"}
 ];
+const RATIO_PRESETS={
+  even:  {solo:33,r22:33,r13:34},
+  random:{solo:12,r22:38,r13:50},
+  solo:  {solo:60,r22:20,r13:20},
+  '22':  {solo:10,r22:70,r13:20},
+  '13':  {solo:10,r22:20,r13:70},
+};
 
 function emptyFlags(){return {near:false,ddang:false,ok:false};}
 function makeRows(){return Array.from({length:18},(_,i)=>({hole:i+1,mode:"미정",team:"",A:"",B:"",C:"",D:"",locked:false,par3:false,carryIn:0,appliedPot:0,winner:"",settlement:"",flags:{A:emptyFlags(),B:emptyFlags(),C:emptyFlags(),D:emptyFlags()}}));}
@@ -317,29 +371,31 @@ function recomputeRows(){
     const winner=getWinner(row);
     row.winner=winner;
     if(!winner){row.settlement="점수를 모두 입력해 주세요.";return;}
-    if(winner==="무승부"){row.settlement=`승부: 무승부 · 다음 홀에 +${money(stake)} 이월`;carry+=stake;return;}
+    if(winner==="무승부"){row.settlement=`무승부 · 다음 홀에 +${money(stake)} 이월`;carry+=stake;return;}
     const lines=[];const pot=row.appliedPot;
     if(row.mode==="개인전"){
       const ranked=[...PLAYERS].sort((a,b)=>compareRank(a,b,row));
       const losers=ranked.slice(1);
-      lines.push(`승부: ${losers.map(p=>`${displayName(state.names,p)} -${money(pot)}`).join(" / ")}`);
+      lines.push(losers.map(p=>`${displayName(state.names,p)} -${money(pot)}`).join("  "));
     }else if(row.mode==="2:2"){
       const [left,right]=row.team.split(" vs ");
       const losers=(winner===left?right:left).split("+");
-      lines.push(`승부: ${displayName(state.names,losers[0])} -${money(pot)} / ${displayName(state.names,losers[1])} -${money(pot)}`);
+      lines.push(losers.map(p=>`${displayName(state.names,p)} -${money(pot)}`).join("  "));
     }else if(row.mode==="1:3"){
       const calc=get13Calc(row);
       if(winner===calc.solo){
         const trio=row.team.split(" vs ")[1].split("+");
-        lines.push(`승부: ${displayName(state.names,trio[0])} -${money(pot)} / ${displayName(state.names,trio[1])} -${money(pot)} / ${displayName(state.names,trio[2])} -${money(pot)}`);
+        lines.push(trio.map(p=>`${displayName(state.names,p)} -${money(pot)}`).join("  "));
       }else{
-        lines.push(`승부: ${displayName(state.names,calc.solo)} -${money(pot*3)}`);
+        lines.push(`${displayName(state.names,calc.solo)} -${money(pot*3)}`);
       }
     }
     if(row.par3){
       const nearWinner=PLAYERS.find(p=>row.flags[p].near);
-      if(nearWinner){const losers=PLAYERS.filter(p=>p!==nearWinner).map(p=>`${displayName(state.names,p)} -${money(10000)}`);lines.push(`니어패배자: ${losers.join(" / ")}`);}
-      else{lines.push(`니어패배자: 없음`);}
+      if(nearWinner){
+        const losers=PLAYERS.filter(p=>p!==nearWinner);
+        lines.push(`니어: `+losers.map(p=>`${displayName(state.names,p)} -${money(10000)}`).join("  "));
+      }
     }
     row.settlement=lines.join("\n");carry=0;
   });
@@ -362,7 +418,7 @@ let state={
   names:{A:"",B:"",C:"",D:""},
   rules:{ddangEnabled:true},
   handy:{A:0,B:0,C:0,D:0},
-  ratio:{mode:'random',solo:33,r22:33,r13:34},
+  ratio:{mode:'even',solo:33,r22:33,r13:34},
   settingLocked:false,
   rows:makeRows(),hole:1,spinning:false
 };
@@ -415,31 +471,21 @@ function toggleLockCurrent(){
   const row=state.rows.find(r=>r.hole===state.hole);row.locked=!row.locked;render();
 }
 function setHole(h){state.hole=h;render();}
-
-// 세팅 잠금 — 토글
 function toggleSettingLock(){
   state.settingLocked=!state.settingLocked;
-  el.settingPanel.classList.toggle('locked', state.settingLocked);
-  el.settingLockBtn.classList.toggle('locked', state.settingLocked);
+  el.settingPanel.classList.toggle('locked',state.settingLocked);
+  el.settingLockBtn.classList.toggle('locked',state.settingLocked);
   el.settingLockBtn.textContent=state.settingLocked?'잠김':'잠금';
 }
 window.toggleSettingLock=toggleSettingLock;
 
 // 방식 비율
-const RATIO_PRESETS={
-  random:{solo:12.5,r22:37.5,r13:50},
-  even:  {solo:33,  r22:33,  r13:34},
-  solo:  {solo:60,  r22:20,  r13:20},
-  '22':  {solo:10,  r22:70,  r13:20},
-  '13':  {solo:10,  r22:20,  r13:70},
-};
 function setRatio(mode){
   state.ratio.mode=mode;
-  ['random','even','solo','22','13'].forEach(k=>{
+  ['even','random','solo','22','13'].forEach(k=>{
     const btn=document.getElementById('ratio-'+k);
-    if(btn) btn.className='mini'+(k===mode?' active':'');
+    if(btn)btn.className='mini'+(k===mode?' active':'');
   });
-  // 슬라이더를 프리셋 값으로 이동
   if(RATIO_PRESETS[mode]){
     const p=RATIO_PRESETS[mode];
     state.ratio.solo=Math.round(p.solo);
@@ -453,36 +499,22 @@ function setRatio(mode){
     document.getElementById('val13').textContent=Math.round(p.r13)+'%';
   }
 }
-
-// 커스텀 슬라이더 — 하나 움직이면 나머지 연동 + 버튼 비활성
 function updateCustomRatio(changed){
   const sEl=document.getElementById('sliderSolo');
   const tEl=document.getElementById('slider22');
   const hEl=document.getElementById('slider13');
   let s=parseInt(sEl.value),t=parseInt(tEl.value),h=parseInt(hEl.value);
   const remain=100-(changed==='solo'?s:changed==='22'?t:h);
-  if(changed==='solo'){
-    const ratio=(t+h)?t/(t+h):0.5;
-    t=Math.round(remain*ratio);h=remain-t;
-    tEl.value=t;hEl.value=h;
-  } else if(changed==='22'){
-    const ratio=(s+h)?s/(s+h):0.5;
-    s=Math.round(remain*ratio);h=remain-s;
-    sEl.value=s;hEl.value=h;
-  } else {
-    const ratio=(s+t)?s/(s+t):0.5;
-    s=Math.round(remain*ratio);t=remain-s;
-    sEl.value=s;tEl.value=t;
-  }
-  state.ratio.solo=s;state.ratio.r22=t;state.ratio.r13=h;
-  state.ratio.mode='custom';
+  if(changed==='solo'){const ratio=(t+h)?t/(t+h):0.5;t=Math.round(remain*ratio);h=remain-t;tEl.value=t;hEl.value=h;}
+  else if(changed==='22'){const ratio=(s+h)?s/(s+h):0.5;s=Math.round(remain*ratio);h=remain-s;sEl.value=s;hEl.value=h;}
+  else{const ratio=(s+t)?s/(s+t):0.5;s=Math.round(remain*ratio);t=remain-s;sEl.value=s;tEl.value=t;}
+  state.ratio.solo=s;state.ratio.r22=t;state.ratio.r13=h;state.ratio.mode='custom';
   document.getElementById('valSolo').textContent=s+'%';
   document.getElementById('val22').textContent=t+'%';
   document.getElementById('val13').textContent=h+'%';
-  // 모든 버튼 비활성 (커스텀 상태)
-  ['random','even','solo','22','13'].forEach(k=>{
+  ['even','random','solo','22','13'].forEach(k=>{
     const btn=document.getElementById('ratio-'+k);
-    if(btn) btn.className='mini';
+    if(btn)btn.className='mini';
   });
 }
 window.setRatio=setRatio;
@@ -493,20 +525,17 @@ function spinCurrentMode(){
   const row=state.rows.find(r=>r.hole===state.hole);
   if(row.locked||state.spinning||row.mode!=="미정")return;
   state.spinning=true;
-  const btn=el.spinBtn;
-  const track=el.spinSlot;
-  const teamEl=document.getElementById('teamText');
-  const teamBox=document.getElementById('teamBox');
+  const btn=el.spinBtn;const track=el.spinSlot;
+  const teamEl=document.getElementById('teamText');const teamBox=document.getElementById('teamBox');
   btn.style.cursor='default';
 
-  // 비율에 따라 방식 결정
   const r=state.ratio;
   let pick;
   if(r.mode==='random'){
     pick=MODES[Math.floor(Math.random()*MODES.length)];
-  } else {
+  }else{
     const rand=Math.random()*100;
-    let modeType=rand<r.solo?'개인전':rand<r.solo+r.r22?'2:2':'1:3';
+    const modeType=rand<r.solo?'개인전':rand<r.solo+r.r22?'2:2':'1:3';
     const filtered=MODES.filter(m=>m.mode===modeType);
     pick=filtered[Math.floor(Math.random()*filtered.length)];
   }
@@ -517,16 +546,14 @@ function spinCurrentMode(){
   const reel=[];
   for(let i=0;i<24;i++) reel.push(LABELS[Math.floor(Math.random()*3)]);
   reel.push(LABELS[(fi+1)%3],LABELS[(fi+2)%3],LABELS[(fi+1)%3],LABELS[(fi+2)%3],LABELS[(fi+1)%3],finalLabel);
-  // 위에서 아래로 내려오게 — 역순으로 빌드 후 위쪽 오프셋에서 시작
   reel.reverse();
 
   teamEl.textContent='';teamBox.style.background='#f8fafc';teamBox.style.border='1px solid #e5e7eb';
 
-  const itemStyle='height:40px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;letter-spacing:0.3px';
+  const itemStyle='height:42px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;letter-spacing:0.3px';
   track.style.transition='none';
   track.innerHTML=reel.map(l=>`<div style="${itemStyle}">${l}</div>`).join('');
-  // 맨 위(마지막 아이템)부터 시작해서 아래로 내려옴
-  const startOffset=-(reel.length-1)*40;
+  const startOffset=-(reel.length-1)*42;
   track.style.transform=`translateY(${startOffset}px)`;
 
   function getDelay(i){if(i<=8)return 38;if(i<=16)return 55;if(i<=24)return 80;if(i<=26)return 130;if(i<=28)return 200;if(i<=29)return 320;return 0;}
@@ -550,7 +577,7 @@ function spinCurrentMode(){
       return;
     }
     step++;
-    const offset=startOffset+(step*40);
+    const offset=startOffset+(step*42);
     track.style.transition=`transform ${getDur(step)}ms ${getEase(step)}`;
     track.style.transform=`translateY(${offset}px)`;
     setTimeout(next,getDelay(step));
@@ -579,7 +606,7 @@ function render(){
   el.totalNameC.textContent=displayName(state.names,"C");el.totalNameD.textContent=displayName(state.names,"D");
   el.totalA.textContent="-"+money(totals.A);el.totalB.textContent="-"+money(totals.B);
   el.totalC.textContent="-"+money(totals.C);el.totalD.textContent="-"+money(totals.D);
-  el.ddangRuleBtn.className="mini "+(state.rules.ddangEnabled?"active":"");
+  el.ddangRuleBtn.className="mini"+(state.rules.ddangEnabled?" active":"");
   el.ddangRuleBtn.textContent=state.rules.ddangEnabled?"인정":"노인정";
   el.holeText.textContent=row.hole;
   el.potText.textContent=money(row.appliedPot||parseStake(state.meta.stake));
@@ -591,26 +618,25 @@ function render(){
   el.lockBtn.style.color=row.locked?'#fff':'#475569';
   el.lockBtn.style.borderColor=row.locked?'#ef4444':'#e5e7eb';
 
+  const itemStyle='height:42px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;letter-spacing:0.3px';
+  const teamEl=document.getElementById('teamText');const teamBox=document.getElementById('teamBox');
   if(!isZero&&!state.spinning){
     const label=row.mode==="2:2"?"2 vs 2":row.mode==="1:3"?"1 vs 3":"개인전";
-    const itemStyle='height:40px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;letter-spacing:0.3px';
     el.spinSlot.innerHTML=`<div style="${itemStyle}">${label}</div>`;
     el.spinSlot.style.transform='translateY(0)';
     el.spinBtn.style.background='#047857';el.spinBtn.style.cursor='default';
-    const teamEl=document.getElementById('teamText');const teamBox=document.getElementById('teamBox');
     teamEl.style.color='#111827';teamEl.textContent=prettyText(row.team,state.names);
     teamBox.style.background='#f0fdf4';teamBox.style.border='1px solid #bbf7d0';
-  } else if(isZero&&!state.spinning){
-    const itemStyle='height:40px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;letter-spacing:0.3px';
+  }else if(isZero&&!state.spinning){
     el.spinSlot.innerHTML=`<div style="${itemStyle}">🎰 방식생성</div>`;
     el.spinSlot.style.transform='translateY(0)';
-    el.spinBtn.style.background='#10b981';el.spinBtn.style.cursor='pointer';
-    const teamEl=document.getElementById('teamText');const teamBox=document.getElementById('teamBox');
+    el.spinBtn.style.background='var(--green)';el.spinBtn.style.cursor='pointer';
     teamEl.style.color='#9ca3af';teamEl.textContent='방식을 생성해주세요';
     teamBox.style.background='#f8fafc';teamBox.style.border='1px solid #e5e7eb';
   }
 
   el.settlementText.textContent=isZero?"방식을 생성하고 점수를 입력해 주세요.":(prettyText(row.settlement,state.names)||"방식을 생성하고 점수를 입력해 주세요.");
+
   el.scoreGrid.innerHTML=PLAYERS.map(p=>{
     const f=row.flags[p];
     const nearDisabled=!row.par3||(!!nearOwner&&nearOwner!==p);
@@ -623,12 +649,13 @@ function render(){
         <button class="step" ${row.locked||isZero?'disabled':''} onclick="changeScore('${p}',1)">+</button>
       </div>
       <div class="flagToggles">
-        <button class="mini ${f.ddang?'active':''}" ${ddangDisabled?'disabled':''} onclick="toggleFlag('${p}','ddang')">땡그랑</button>
-        <button class="mini ${f.ok?'active':''}" ${ddangDisabled?'disabled':''} onclick="toggleFlag('${p}','ok')">OK</button>
-        <button class="mini ${f.near?'active':''}" ${row.locked||isZero||nearDisabled?'disabled':''} onclick="toggleFlag('${p}','near')">니어</button>
+        <button class="mini ${f.ddang?'active':''}" ${ddangDisabled?'disabled':''} onclick="toggleFlag('${p}','ddang')" style="font-size:12px">땡그랑</button>
+        <button class="mini ${f.ok?'active':''}" ${ddangDisabled?'disabled':''} onclick="toggleFlag('${p}','ok')" style="font-size:12px">OK</button>
+        <button class="mini ${f.near?'active':''}" ${row.locked||isZero||nearDisabled?'disabled':''} onclick="toggleFlag('${p}','near')" style="font-size:12px">니어</button>
       </div>
     </div>`;
   }).join("");
+
   el.holesGrid.innerHTML=state.rows.map(r=>{
     const done=r.mode!=="미정"||PLAYERS.some(p=>r[p]!="")||r.par3;
     const cls=state.hole===r.hole?"active":(done?"done":"");
@@ -720,6 +747,8 @@ window.toggleFlag=toggleFlag;
 window.setHole=setHole;
 window.spinCurrentMode=spinCurrentMode;
 
+// 균등을 디폴트로 슬라이더 초기화
+setRatio('even');
 render();
 </script>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/golf-app/sw.js');}</script>
