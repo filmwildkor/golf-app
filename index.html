@@ -164,31 +164,28 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
         </div>
         <div style="margin-top:12px">
           <div class="label">방식 비율</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px" id="ratioGrid">
-            <button class="mini active" id="ratio-random" onclick="setRatio('random')">완전 랜덤</button>
-            <button class="mini" id="ratio-even" onclick="setRatio('even')">균등</button>
-            <button class="mini" id="ratio-solo" onclick="setRatio('solo')">개인전 위주</button>
-            <button class="mini" id="ratio-22" onclick="setRatio('22')">2vs2 위주</button>
-            <button class="mini" id="ratio-13" onclick="setRatio('13')">1vs3 위주</button>
-            <button class="mini" id="ratio-custom" onclick="setRatio('custom')">커스텀</button>
+          <div style="display:flex;gap:4px;margin-top:6px" id="ratioGrid">
+            <button class="mini active" id="ratio-random" onclick="setRatio('random')" style="font-size:9px">완전랜덤</button>
+            <button class="mini" id="ratio-even" onclick="setRatio('even')" style="font-size:9px">균등</button>
+            <button class="mini" id="ratio-solo" onclick="setRatio('solo')" style="font-size:9px">개인전↑</button>
+            <button class="mini" id="ratio-22" onclick="setRatio('22')" style="font-size:9px">2vs2↑</button>
+            <button class="mini" id="ratio-13" onclick="setRatio('13')" style="font-size:9px">1vs3↑</button>
           </div>
-          <div id="customRatioWrap" style="display:none;margin-top:10px;padding:10px;background:#fff;border-radius:12px;border:1px solid #e5e7eb">
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <div style="display:flex;align-items:center;gap:8px">
-                <span style="font-size:11px;font-weight:800;color:#6b7280;width:52px;flex-shrink:0">개인전</span>
-                <input type="range" id="sliderSolo" min="0" max="100" value="33" oninput="updateCustomRatio('solo')" style="flex:1;accent-color:#10b981">
-                <span style="font-size:12px;font-weight:900;color:#111827;width:34px;text-align:right" id="valSolo">33%</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <span style="font-size:11px;font-weight:800;color:#6b7280;width:52px;flex-shrink:0">2vs2</span>
-                <input type="range" id="slider22" min="0" max="100" value="33" oninput="updateCustomRatio('22')" style="flex:1;accent-color:#10b981">
-                <span style="font-size:12px;font-weight:900;color:#111827;width:34px;text-align:right" id="val22">33%</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <span style="font-size:11px;font-weight:800;color:#6b7280;width:52px;flex-shrink:0">1vs3</span>
-                <input type="range" id="slider13" min="0" max="100" value="34" oninput="updateCustomRatio('13')" style="flex:1;accent-color:#10b981">
-                <span style="font-size:12px;font-weight:900;color:#111827;width:34px;text-align:right" id="val13">34%</span>
-              </div>
+          <div style="margin-top:10px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:11px;font-weight:800;color:#6b7280;width:52px;flex-shrink:0">개인전</span>
+              <input type="range" id="sliderSolo" min="0" max="100" value="33" oninput="updateCustomRatio('solo')" style="flex:1;accent-color:#10b981">
+              <span style="font-size:12px;font-weight:900;color:#111827;width:34px;text-align:right" id="valSolo">33%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:11px;font-weight:800;color:#6b7280;width:52px;flex-shrink:0">2vs2</span>
+              <input type="range" id="slider22" min="0" max="100" value="33" oninput="updateCustomRatio('22')" style="flex:1;accent-color:#10b981">
+              <span style="font-size:12px;font-weight:900;color:#111827;width:34px;text-align:right" id="val22">33%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:11px;font-weight:800;color:#6b7280;width:52px;flex-shrink:0">1vs3</span>
+              <input type="range" id="slider13" min="0" max="100" value="34" oninput="updateCustomRatio('13')" style="flex:1;accent-color:#10b981">
+              <span style="font-size:12px;font-weight:900;color:#111827;width:34px;text-align:right" id="val13">34%</span>
             </div>
           </div>
         </div>
@@ -331,8 +328,12 @@ function recomputeRows(){
       lines.push(`승부: ${displayName(state.names,losers[0])} -${money(pot)} / ${displayName(state.names,losers[1])} -${money(pot)}`);
     }else if(row.mode==="1:3"){
       const calc=get13Calc(row);
-      if(winner===calc.solo){lines.push(`승부: ${displayName(state.names,calc.solo)} -${money(pot*3)}`);}
-      else{const trio=row.team.split(" vs ")[1].split("+");lines.push(`승부: ${displayName(state.names,trio[0])} -${money(pot)} / ${displayName(state.names,trio[1])} -${money(pot)} / ${displayName(state.names,trio[2])} -${money(pot)}`);}
+      if(winner===calc.solo){
+        const trio=row.team.split(" vs ")[1].split("+");
+        lines.push(`승부: ${displayName(state.names,trio[0])} -${money(pot)} / ${displayName(state.names,trio[1])} -${money(pot)} / ${displayName(state.names,trio[2])} -${money(pot)}`);
+      }else{
+        lines.push(`승부: ${displayName(state.names,calc.solo)} -${money(pot*3)}`);
+      }
     }
     if(row.par3){
       const nearWinner=PLAYERS.find(p=>row.flags[p].near);
@@ -349,7 +350,7 @@ function calcTotals(){
     const pot=row.appliedPot||0;
     if(row.mode==="개인전"){const ranked=[...PLAYERS].sort((a,b)=>compareRank(a,b,row));out[ranked[2]]+=pot;out[ranked[3]]+=pot;}
     else if(row.mode==="2:2"){const [left,right]=row.team.split(" vs ");const losers=(row.winner===left?right:left).split("+");losers.forEach(p=>out[p]+=pot);}
-    else if(row.mode==="1:3"){const calc=get13Calc(row);if(row.winner===calc.solo){out[calc.solo]+=pot*3;}else{row.team.split(" vs ")[1].split("+").forEach(p=>out[p]+=pot);}}
+    else if(row.mode==="1:3"){const calc=get13Calc(row);if(row.winner===calc.solo){row.team.split(" vs ")[1].split("+").forEach(p=>out[p]+=pot);}else{out[calc.solo]+=pot*3;}}
     if(row.par3){const nearWinner=PLAYERS.find(p=>row.flags[p].near);if(nearWinner){PLAYERS.filter(p=>p!==nearWinner).forEach(p=>out[p]+=10000);}}
   });
   return out;
@@ -424,24 +425,35 @@ function toggleSettingLock(){
 window.toggleSettingLock=toggleSettingLock;
 
 // 방식 비율
+const RATIO_PRESETS={
+  random:{solo:12.5,r22:37.5,r13:50},
+  even:  {solo:33,  r22:33,  r13:34},
+  solo:  {solo:60,  r22:20,  r13:20},
+  '22':  {solo:10,  r22:70,  r13:20},
+  '13':  {solo:10,  r22:20,  r13:70},
+};
 function setRatio(mode){
-  const cur=state.ratio.mode;
-  // 커스텀 재클릭시 토글
-  if(mode==='custom'&&cur==='custom'){
-    document.getElementById('customRatioWrap').style.display='none';
-    state.ratio.mode='random';
-    mode='random';
-  } else {
-    state.ratio.mode=mode;
-    document.getElementById('customRatioWrap').style.display=mode==='custom'?'block':'none';
-  }
-  ['random','even','solo','22','13','custom'].forEach(k=>{
+  state.ratio.mode=mode;
+  ['random','even','solo','22','13'].forEach(k=>{
     const btn=document.getElementById('ratio-'+k);
     if(btn) btn.className='mini'+(k===mode?' active':'');
   });
+  // 슬라이더를 프리셋 값으로 이동
+  if(RATIO_PRESETS[mode]){
+    const p=RATIO_PRESETS[mode];
+    state.ratio.solo=Math.round(p.solo);
+    state.ratio.r22=Math.round(p.r22);
+    state.ratio.r13=Math.round(p.r13);
+    document.getElementById('sliderSolo').value=Math.round(p.solo);
+    document.getElementById('slider22').value=Math.round(p.r22);
+    document.getElementById('slider13').value=Math.round(p.r13);
+    document.getElementById('valSolo').textContent=Math.round(p.solo)+'%';
+    document.getElementById('val22').textContent=Math.round(p.r22)+'%';
+    document.getElementById('val13').textContent=Math.round(p.r13)+'%';
+  }
 }
 
-// 커스텀 슬라이더 — 하나 움직이면 나머지 연동
+// 커스텀 슬라이더 — 하나 움직이면 나머지 연동 + 버튼 비활성
 function updateCustomRatio(changed){
   const sEl=document.getElementById('sliderSolo');
   const tEl=document.getElementById('slider22');
@@ -449,22 +461,28 @@ function updateCustomRatio(changed){
   let s=parseInt(sEl.value),t=parseInt(tEl.value),h=parseInt(hEl.value);
   const remain=100-(changed==='solo'?s:changed==='22'?t:h);
   if(changed==='solo'){
-    const ratio=t/(t+h)||0.5;
+    const ratio=(t+h)?t/(t+h):0.5;
     t=Math.round(remain*ratio);h=remain-t;
     tEl.value=t;hEl.value=h;
   } else if(changed==='22'){
-    const ratio=s/(s+h)||0.5;
+    const ratio=(s+h)?s/(s+h):0.5;
     s=Math.round(remain*ratio);h=remain-s;
     sEl.value=s;hEl.value=h;
   } else {
-    const ratio=s/(s+t)||0.5;
+    const ratio=(s+t)?s/(s+t):0.5;
     s=Math.round(remain*ratio);t=remain-s;
     sEl.value=s;tEl.value=t;
   }
   state.ratio.solo=s;state.ratio.r22=t;state.ratio.r13=h;
+  state.ratio.mode='custom';
   document.getElementById('valSolo').textContent=s+'%';
   document.getElementById('val22').textContent=t+'%';
   document.getElementById('val13').textContent=h+'%';
+  // 모든 버튼 비활성 (커스텀 상태)
+  ['random','even','solo','22','13'].forEach(k=>{
+    const btn=document.getElementById('ratio-'+k);
+    if(btn) btn.className='mini';
+  });
 }
 window.setRatio=setRatio;
 window.updateCustomRatio=updateCustomRatio;
@@ -486,14 +504,8 @@ function spinCurrentMode(){
   if(r.mode==='random'){
     pick=MODES[Math.floor(Math.random()*MODES.length)];
   } else {
-    let solo=33,r22=33,r13=34;
-    if(r.mode==='even'){solo=33;r22=33;r13=34;}
-    else if(r.mode==='solo'){solo=60;r22=20;r13=20;}
-    else if(r.mode==='22'){solo=10;r22=70;r13=20;}
-    else if(r.mode==='13'){solo=10;r22=20;r13=70;}
-    else if(r.mode==='custom'){solo=r.solo;r22=r.r22;r13=r.r13;}
     const rand=Math.random()*100;
-    let modeType=rand<solo?'개인전':rand<solo+r22?'2:2':'1:3';
+    let modeType=rand<r.solo?'개인전':rand<r.solo+r.r22?'2:2':'1:3';
     const filtered=MODES.filter(m=>m.mode===modeType);
     pick=filtered[Math.floor(Math.random()*filtered.length)];
   }
@@ -504,13 +516,17 @@ function spinCurrentMode(){
   const reel=[];
   for(let i=0;i<24;i++) reel.push(LABELS[Math.floor(Math.random()*3)]);
   reel.push(LABELS[(fi+1)%3],LABELS[(fi+2)%3],LABELS[(fi+1)%3],LABELS[(fi+2)%3],LABELS[(fi+1)%3],finalLabel);
+  // 위에서 아래로 내려오게 — 역순으로 빌드 후 위쪽 오프셋에서 시작
+  reel.reverse();
 
   teamEl.textContent='';teamBox.style.background='#f8fafc';teamBox.style.border='1px solid #e5e7eb';
 
   const itemStyle='height:40px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;letter-spacing:0.3px';
   track.style.transition='none';
   track.innerHTML=reel.map(l=>`<div style="${itemStyle}">${l}</div>`).join('');
-  track.style.transform='translateY(0)';
+  // 맨 위(마지막 아이템)부터 시작해서 아래로 내려옴
+  const startOffset=-(reel.length-1)*40;
+  track.style.transform=`translateY(${startOffset}px)`;
 
   function getDelay(i){if(i<=8)return 38;if(i<=16)return 55;if(i<=24)return 80;if(i<=26)return 130;if(i<=28)return 200;if(i<=29)return 320;return 0;}
   function getEase(i){if(i<reel.length-2)return 'linear';if(i===reel.length-2)return 'cubic-bezier(0.33,1,0.68,1)';return 'cubic-bezier(0.34,1.56,0.64,1)';}
@@ -533,8 +549,9 @@ function spinCurrentMode(){
       return;
     }
     step++;
+    const offset=startOffset+(step*40);
     track.style.transition=`transform ${getDur(step)}ms ${getEase(step)}`;
-    track.style.transform=`translateY(-${step*40}px)`;
+    track.style.transform=`translateY(${offset}px)`;
     setTimeout(next,getDelay(step));
   }
   setTimeout(next,20);
