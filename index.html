@@ -233,13 +233,13 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
 <!-- 게임 카드 -->
 <div class="card">
   <div class="head">
-    <div style="display:flex;gap:6px;align-items:center">
-      <div style="flex-shrink:0;width:64px;display:flex;align-items:baseline;gap:2px">
-        <div style="font-size:26px;font-weight:900;line-height:1;color:#111827" id="holeText">1</div>
-        <div style="font-size:13px;font-weight:400;color:#9ca3af" id="holeProgress">/18</div>
-      </div>
-      <!-- 방식생성 + PAR3 홀번호 바로 옆 -->
-      <div style="display:flex;gap:5px;flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:0">
+      <!-- 왼쪽: 홀번호 + 방식생성 + PAR3 한 묶음 -->
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="display:flex;align-items:baseline;gap:2px">
+          <div style="font-size:26px;font-weight:900;line-height:1;color:#111827" id="holeText">1</div>
+          <div style="font-size:13px;font-weight:400;color:#9ca3af" id="holeProgress">/18</div>
+        </div>
         <button id="spinBtn" onclick="spinCurrentMode()" style="width:100px;height:40px;border-radius:12px;border:none;background:#10b981;cursor:pointer;overflow:hidden;position:relative;padding:0">
           <div style="position:absolute;top:0;left:0;right:0;height:9px;background:linear-gradient(to bottom,rgba(0,0,0,0.15),transparent);z-index:2;pointer-events:none"></div>
           <div style="position:absolute;bottom:0;left:0;right:0;height:9px;background:linear-gradient(to top,rgba(0,0,0,0.15),transparent);z-index:2;pointer-events:none"></div>
@@ -249,11 +249,13 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
         </button>
         <button id="par3Btn" onclick="togglePar3()" style="width:50px;height:40px;border-radius:12px;border:1px solid #e5e7eb;background:#f8fafc;font-size:10px;font-weight:900;color:#475569;cursor:pointer">PAR3</button>
       </div>
-      <!-- 빈 공간 -->
-      <div style="flex:1;min-width:0"></div>
-      <!-- LOCK 원래 위치 (금액 왼쪽) -->
-      <button id="lockToggleBtn" onclick="toggleLockCurrent()" style="width:50px;flex-shrink:0;height:40px;border-radius:12px;border:1px solid #e5e7eb;background:#f8fafc;font-size:10px;font-weight:900;color:#475569;cursor:pointer">LOCK</button>
-      <div id="potText" style="font-size:20px;font-weight:900;color:#d97706;white-space:nowrap;flex-shrink:0;min-width:80px;text-align:right">0원</div>
+      <!-- 여백 -->
+      <div style="flex:1"></div>
+      <!-- 오른쪽: LOCK + 금액 -->
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <button id="lockToggleBtn" onclick="toggleLockCurrent()" style="width:50px;height:40px;border-radius:12px;border:1px solid #e5e7eb;background:#f8fafc;font-size:10px;font-weight:900;color:#475569;cursor:pointer">LOCK</button>
+        <div id="potText" style="font-size:20px;font-weight:900;color:#d97706;white-space:nowrap;min-width:72px;text-align:right">0원</div>
+      </div>
     </div>
     <div id="teamBox" style="background:#f8fafc;border-radius:12px;height:40px;display:flex;align-items:center;justify-content:center;border:1px solid #e5e7eb">
       <div id="teamText" style="font-size:13px;font-weight:900;color:#9ca3af;letter-spacing:0.2px">방식을 생성해주세요</div>
