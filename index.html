@@ -19,8 +19,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 
 /* 세팅 패널 */
 .setting-panel{background:rgba(255,255,255,.94);border-radius:24px;box-shadow:0 18px 34px rgba(0,0,0,.18);margin-top:8px;overflow:hidden;transition:opacity 0.3s}
-.setting-panel.locked{opacity:0.7;pointer-events:none}
-.setting-panel.locked .setting-body{display:none}
+.setting-panel.locked{opacity:0.6}
+.setting-panel.locked .setting-body{pointer-events:none}
 .setting-header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px 10px}
 .setting-title{font-size:13px;font-weight:900;color:#047857}
 .setting-lock-btn{height:30px;border-radius:10px;border:1px solid #d1d5db;background:#fff;font-size:10px;font-weight:900;color:#475569;cursor:pointer;padding:0 12px;user-select:none}
@@ -125,7 +125,7 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
   <div class="setting-panel" id="settingPanel">
     <div class="setting-header">
       <span class="setting-title">⚙️ 세팅</span>
-      <button class="setting-lock-btn" id="settingLockBtn" onmousedown="startLockHold()" onmouseup="cancelLockHold()" ontouchstart="startLockHold()" ontouchend="cancelLockHold()">잠금</button>
+      <button class="setting-lock-btn" id="settingLockBtn" onclick="toggleSettingLock()">잠금</button>
     </div>
     <div class="setting-body">
       <div class="grid2">
@@ -414,30 +414,14 @@ function toggleLockCurrent(){
 }
 function setHole(h){state.hole=h;render();}
 
-// 세팅 잠금 — 길게 눌러야 해제
-let lockHoldTimer=null;
-function startLockHold(){
-  if(!state.settingLocked){
-    // 잠금은 즉시
-    state.settingLocked=true;
-    el.settingPanel.classList.add('locked');
-    el.settingLockBtn.classList.add('locked');
-    el.settingLockBtn.textContent='잠김 (길게 눌러 해제)';
-  } else {
-    // 해제는 1초 길게
-    lockHoldTimer=setTimeout(()=>{
-      state.settingLocked=false;
-      el.settingPanel.classList.remove('locked');
-      el.settingLockBtn.classList.remove('locked');
-      el.settingLockBtn.textContent='잠금';
-    },1000);
-  }
+// 세팅 잠금 — 토글
+function toggleSettingLock(){
+  state.settingLocked=!state.settingLocked;
+  el.settingPanel.classList.toggle('locked', state.settingLocked);
+  el.settingLockBtn.classList.toggle('locked', state.settingLocked);
+  el.settingLockBtn.textContent=state.settingLocked?'잠김':'잠금';
 }
-function cancelLockHold(){
-  if(lockHoldTimer){clearTimeout(lockHoldTimer);lockHoldTimer=null;}
-}
-window.startLockHold=startLockHold;
-window.cancelLockHold=cancelLockHold;
+window.toggleSettingLock=toggleSettingLock;
 
 // 방식 비율
 function setRatio(mode){
