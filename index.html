@@ -202,9 +202,9 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
 <div class="card">
   <div class="head">
     <div style="display:flex;gap:6px;align-items:center">
-      <div style="flex-shrink:0;width:52px">
+      <div style="flex-shrink:0;width:64px;display:flex;align-items:baseline;gap:2px">
         <div style="font-size:26px;font-weight:900;line-height:1;color:#111827" id="holeText">1</div>
-        <div style="font-size:10px;font-weight:700;color:#9ca3af;margin-top:1px" id="holeProgress">/ 18</div>
+        <div style="font-size:13px;font-weight:400;color:#9ca3af" id="holeProgress">/18</div>
       </div>
       <div style="display:flex;gap:5px;flex:1;min-width:0">
         <button id="spinBtn" onclick="spinCurrentMode()" style="width:100px;flex-shrink:0;height:40px;border-radius:12px;border:none;background:#10b981;cursor:pointer;overflow:hidden;position:relative;padding:0">
@@ -602,14 +602,20 @@ function render(){
   el.ddangRuleBtn.className="mini"+(state.rules.ddangEnabled?" active":"");
   el.ddangRuleBtn.textContent=state.rules.ddangEnabled?"인정":"노인정";
   el.holeText.textContent=row.hole;
-  document.getElementById('holeProgress').textContent='/ 18';
+  document.getElementById('holeProgress').textContent='/18';
   el.potText.textContent=money(row.appliedPot||parseStake(state.meta.stake));
+
+  // PAR3 토글 스타일
   el.par3Btn.style.background=row.par3?'#111827':'#f8fafc';
   el.par3Btn.style.color=row.par3?'#fff':'#475569';
   el.par3Btn.style.borderColor=row.par3?'#111827':'#e5e7eb';
-  el.lockBtn.style.background=row.locked?'#ef4444':'#f8fafc';
-  el.lockBtn.style.color=row.locked?'#fff':'#475569';
-  el.lockBtn.style.borderColor=row.locked?'#ef4444':'#e5e7eb';
+
+  // LOCK: 정산이 확정됐을 때만 활성화 가능 (잠긴 상태이거나 winner가 있을 때)
+  const canLock=row.locked||(row.winner&&row.winner!=="");
+  el.lockBtn.style.background=row.locked?'#ef4444':canLock?'#f8fafc':'#f1f5f9';
+  el.lockBtn.style.color=row.locked?'#fff':canLock?'#475569':'#d1d5db';
+  el.lockBtn.style.borderColor=row.locked?'#ef4444':canLock?'#e5e7eb':'#f1f5f9';
+  el.lockBtn.disabled=!canLock;
   const IS='height:40px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;letter-spacing:0.3px';
   const teamEl=document.getElementById('teamText'),teamBox=document.getElementById('teamBox');
   if(!isZero&&!state.spinning){
@@ -627,7 +633,10 @@ function render(){
   el.settlementText.textContent=isZero?"방식을 생성하고 점수를 입력해 주세요.":(prettyText(row.settlement,state.names)||"방식을 생성하고 점수를 입력해 주세요.");
   el.scoreGrid.innerHTML=PLAYERS.map(p=>{
     const f=row.flags[p];
-    const nearDisabled=!row.par3||(!!nearOwner&&nearOwner!==p);
+    // 니어: par3 켜져있고, locked 아니고, 방식생성 됐을 때 활성
+    // 다른 사람이 이미 니어 선택했으면 나머지는 비활성
+    const nearActive=f.near;
+    const nearDisabled=row.locked||isZero||!row.par3||(!!nearOwner&&nearOwner!==p);
     const ddangDisabled=row.locked||isZero||ddangOff;
     return `<div class="scoreBox">
       <div class="scoreName">${displayName(state.names,p)}</div>
@@ -639,7 +648,7 @@ function render(){
       <div class="flagToggles">
         <button class="mini ${f.ddang?'active':''}" ${ddangDisabled?'disabled':''} onclick="toggleFlag('${p}','ddang')">땡그랑</button>
         <button class="mini ${f.ok?'active':''}" ${ddangDisabled?'disabled':''} onclick="toggleFlag('${p}','ok')">OK</button>
-        <button class="mini ${f.near?'active':''}" ${row.locked||isZero||nearDisabled?'disabled':''} onclick="toggleFlag('${p}','near')">니어</button>
+        <button class="mini ${nearActive?'active':''}" ${nearDisabled?'disabled':''} onclick="toggleFlag('${p}','near')" style="${row.par3?'':'opacity:0.3'}">니어</button>
       </div>
     </div>`;
   }).join("");
