@@ -47,10 +47,10 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
 /* 정산 */
 .settle{border:1px solid #d1fae5;background:linear-gradient(90deg,#ecfdf5,#f7fee7);border-radius:20px;padding:11px 14px;margin-top:8px;min-height:74px;display:flex;align-items:center}
 .settle-inner{width:100%}
-.settle-line{display:flex;align-items:baseline;gap:4px;line-height:1.7}
-.settle-key{font-size:11px;font-weight:700;color:#047857;width:36px;flex-shrink:0}
-.settle-val{font-size:13px;font-weight:800;color:#064e3b;display:flex;flex-wrap:wrap;gap:0 10px}
-.settle-item{white-space:nowrap}
+.settle-line{display:flex;align-items:baseline;gap:6px;line-height:1.9}
+.settle-key{font-size:13px;font-weight:800;color:#047857;width:40px;flex-shrink:0}
+.settle-val{display:flex;flex-wrap:wrap;gap:0}
+.settle-item{font-size:13px;font-weight:800;color:#064e3b;white-space:nowrap;min-width:90px}
 .settle-empty{font-size:13px;font-weight:700;color:#9ca3af;text-align:center;width:100%}
 
 /* 홀 이동 */
@@ -673,18 +673,30 @@ function render(){
   }
   // 정산 칸 렌더링
   const settleEl=document.getElementById('settlementText');
-  const settleText=isZero?"방식을 생성하고 점수를 입력해 주세요.":(prettyText(row.settlement,state.names)||"방식을 생성하고 점수를 입력해 주세요.");
   if(!row.settlement||isZero){
-    settleEl.innerHTML=`<div class="settle-empty">${settleText}</div>`;
+    settleEl.innerHTML=`<div class="settle-empty">${isZero?"방식을 생성하고 점수를 입력해 주세요.":prettyText(row.settlement,state.names)||"방식을 생성하고 점수를 입력해 주세요."}</div>`;
   }else{
     const rawLines=prettyText(row.settlement,state.names).split('\n');
     settleEl.innerHTML=rawLines.map(line=>{
       if(line.includes(' : ')){
-        const [key,...rest]=line.split(' : ');
-        const items=rest.join(' : ').split('  |  ');
-        return `<div class="settle-line"><span class="settle-key">${key} :</span><span class="settle-val">${items.map(i=>`<span class="settle-item">${i}</span>`).join('')}</span></div>`;
+        const colonIdx=line.indexOf(' : ');
+        const key=line.substring(0,colonIdx);
+        const rest=line.substring(colonIdx+3);
+        const items=rest.split('  |  ');
+        // 각 아이템을 "이름 고정폭 + 장수 고정폭" 으로 분리
+        const itemsHtml=items.map(item=>{
+          // "홍길동 2장" → 마지막 공백으로 이름/값 분리
+          const lastSpace=item.lastIndexOf(' ');
+          if(lastSpace>0){
+            const name=item.substring(0,lastSpace);
+            const val=item.substring(lastSpace+1);
+            return `<span style="display:inline-flex;min-width:100px"><span style="flex:1;overflow:hidden;text-overflow:ellipsis">${name}</span><span style="min-width:28px;text-align:right;padding-left:2px">${val}</span></span>`;
+          }
+          return `<span style="min-width:100px">${item}</span>`;
+        }).join('');
+        return `<div class="settle-line"><span class="settle-key">${key} :</span><span class="settle-val">${itemsHtml}</span></div>`;
       }
-      return `<div class="settle-line" style="font-size:12px;color:#047857;font-weight:700">${line}</div>`;
+      return `<div class="settle-line">${line}</div>`;
     }).join('');
   }
   el.scoreGrid.innerHTML=PLAYERS.map(p=>{
