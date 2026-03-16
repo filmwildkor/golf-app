@@ -292,6 +292,34 @@ function get13Calc(row){
   const ranked=[...trio].sort((a,b)=>compareRank(a,b,row));
   return {solo,ranked,soloWeighted:soloScore*2,trioBestTwo:score(row[ranked[0]])+score(row[ranked[1]])};
 }
+function getWinner(row){
+  const s={A:score(row.A),B:score(row.B),C:score(row.C),D:score(row.D)};
+  if(Object.values(s).some(v=>v===null))return "";
+  if(row.mode==="개인전"){
+    const min=Math.min(...Object.values(s));
+    const leaders=PLAYERS.filter(p=>s[p]===min);
+    if(leaders.length===1)return leaders[0];
+    const ranked=[...leaders].sort((a,b)=>compareRank(a,b,row));
+    return compareRank(ranked[0],ranked[1],row)!==0?ranked[0]:"무승부";
+  }
+  if(row.mode==="2:2"){
+    const [left,right]=row.team.split(" vs ");
+    const lps=left.split("+"),rps=right.split("+");
+    const ls=lps.reduce((a,p)=>a+s[p],0),rs=rps.reduce((a,p)=>a+s[p],0);
+    if(ls!==rs)return ls<rs?left:right;
+    const lr=[...lps].sort((a,b)=>compareRank(a,b,row));
+    const rr=[...rps].sort((a,b)=>compareRank(a,b,row));
+    const c1=compareRank(lr[0],rr[0],row);if(c1!==0)return c1<0?left:right;
+    const c2=compareRank(lr[1],rr[1],row);if(c2!==0)return c2<0?left:right;
+    return "무승부";
+  }
+  if(row.mode==="1:3"){
+    const calc=get13Calc(row);if(!calc)return "";
+    if(calc.soloWeighted!==calc.trioBestTwo)return calc.soloWeighted<calc.trioBestTwo?calc.solo:row.team.split(" vs ")[1];
+    return "무승부";
+  }
+  return "";
+}
 function hasTie(row){
   // 동타가 있는지 체크 (모드별)
   const s={A:score(row.A),B:score(row.B),C:score(row.C),D:score(row.D)};
@@ -319,6 +347,7 @@ function flagConfirmed(row){
   // 인정이면 4명 모두 땡그랑 or OK를 눌러야 결과
   return PLAYERS.every(p=>row.flags[p].ddang||row.flags[p].ok);
 }
+function getWinner(row){
   const s={A:score(row.A),B:score(row.B),C:score(row.C),D:score(row.D)};
   if(Object.values(s).some(v=>v===null))return "";
   if(row.mode==="개인전"){
