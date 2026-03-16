@@ -70,7 +70,7 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
 .autocomplete-item:hover{background:#f0fdf4;color:#047857;font-weight:700}
 
 /* 드럼롤 */
-.drum-item{height:42px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#9ca3af;user-select:none}
+.drum-item{height:42px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#9ca3af;user-select:none;scroll-snap-align:center}
 .drum-item.selected{color:#111827;font-size:21px}
 #hourDrum::-webkit-scrollbar,#minDrum::-webkit-scrollbar{display:none}
 </style>
@@ -112,14 +112,14 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
             <div style="position:absolute;top:0;left:0;right:0;height:48px;background:linear-gradient(to bottom,#f8fafc,transparent);z-index:2;pointer-events:none"></div>
             <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(to top,#f8fafc,transparent);z-index:2;pointer-events:none"></div>
             <div style="position:absolute;top:50%;left:0;right:0;height:42px;transform:translateY(-50%);border-top:2px solid #10b981;border-bottom:2px solid #10b981;z-index:1;pointer-events:none"></div>
-            <div id="hourDrum" style="overflow-y:scroll;height:150px;scrollbar-width:none;-ms-overflow-style:none"></div>
+            <div id="hourDrum" style="overflow-y:scroll;height:150px;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch"></div>
           </div>
           <span style="font-size:28px;font-weight:900;color:#374151;flex-shrink:0">:</span>
           <div style="flex:1;position:relative;height:150px;overflow:hidden;border:1px solid #e5e7eb;border-radius:16px;background:#f8fafc">
             <div style="position:absolute;top:0;left:0;right:0;height:48px;background:linear-gradient(to bottom,#f8fafc,transparent);z-index:2;pointer-events:none"></div>
             <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(to top,#f8fafc,transparent);z-index:2;pointer-events:none"></div>
             <div style="position:absolute;top:50%;left:0;right:0;height:42px;transform:translateY(-50%);border-top:2px solid #10b981;border-bottom:2px solid #10b981;z-index:1;pointer-events:none"></div>
-            <div id="minDrum" style="overflow-y:scroll;height:150px;scrollbar-width:none;-ms-overflow-style:none"></div>
+            <div id="minDrum" style="overflow-y:scroll;height:150px;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch"></div>
           </div>
         </div>
         <div style="text-align:center;margin-top:14px;font-size:24px;font-weight:900;color:#111827" id="timeDisplay">07:00</div>
@@ -468,7 +468,7 @@ document.getElementById("newRoundBtn").addEventListener("click",()=>{ localStora
 // ===== 티오프 드럼롤 팝업 =====
 (function(){
   const HOURS=Array.from({length:13},(_,i)=>i+5);
-  const MINS=[0,10,20,30,40,50];
+  const MINS=Array.from({length:60},(_,i)=>i);
   let selH=7, selM=0, built=false;
 
   function buildDrum(el,items,selected,onSelect){
