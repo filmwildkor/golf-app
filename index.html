@@ -167,9 +167,9 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
           <div style="display:flex;gap:4px;margin-top:6px" id="ratioGrid">
             <button class="mini active" id="ratio-random" onclick="setRatio('random')" style="font-size:9px">완전랜덤</button>
             <button class="mini" id="ratio-even" onclick="setRatio('even')" style="font-size:9px">균등</button>
-            <button class="mini" id="ratio-solo" onclick="setRatio('solo')" style="font-size:9px">개인전↑</button>
-            <button class="mini" id="ratio-22" onclick="setRatio('22')" style="font-size:9px">2vs2↑</button>
-            <button class="mini" id="ratio-13" onclick="setRatio('13')" style="font-size:9px">1vs3↑</button>
+            <button class="mini" id="ratio-solo" onclick="setRatio('solo')" style="font-size:9px">개인전 위주</button>
+            <button class="mini" id="ratio-22" onclick="setRatio('22')" style="font-size:9px">2vs2 위주</button>
+            <button class="mini" id="ratio-13" onclick="setRatio('13')" style="font-size:9px">1vs3 위주</button>
           </div>
           <div style="margin-top:10px;display:flex;flex-direction:column;gap:10px">
             <div style="display:flex;align-items:center;gap:8px">
@@ -321,7 +321,8 @@ function recomputeRows(){
     const lines=[];const pot=row.appliedPot;
     if(row.mode==="개인전"){
       const ranked=[...PLAYERS].sort((a,b)=>compareRank(a,b,row));
-      lines.push(`승부: ${displayName(state.names,ranked[2])} -${money(pot)} / ${displayName(state.names,ranked[3])} -${money(pot)}`);
+      const losers=ranked.slice(1);
+      lines.push(`승부: ${losers.map(p=>`${displayName(state.names,p)} -${money(pot)}`).join(" / ")}`);
     }else if(row.mode==="2:2"){
       const [left,right]=row.team.split(" vs ");
       const losers=(winner===left?right:left).split("+");
@@ -348,7 +349,7 @@ function calcTotals(){
   state.rows.forEach(row=>{
     if(!row.winner||row.winner==="무승부")return;
     const pot=row.appliedPot||0;
-    if(row.mode==="개인전"){const ranked=[...PLAYERS].sort((a,b)=>compareRank(a,b,row));out[ranked[2]]+=pot;out[ranked[3]]+=pot;}
+    if(row.mode==="개인전"){const ranked=[...PLAYERS].sort((a,b)=>compareRank(a,b,row));ranked.slice(1).forEach(p=>out[p]+=pot);}
     else if(row.mode==="2:2"){const [left,right]=row.team.split(" vs ");const losers=(row.winner===left?right:left).split("+");losers.forEach(p=>out[p]+=pot);}
     else if(row.mode==="1:3"){const calc=get13Calc(row);if(row.winner===calc.solo){row.team.split(" vs ")[1].split("+").forEach(p=>out[p]+=pot);}else{out[calc.solo]+=pot*3;}}
     if(row.par3){const nearWinner=PLAYERS.find(p=>row.flags[p].near);if(nearWinner){PLAYERS.filter(p=>p!==nearWinner).forEach(p=>out[p]+=10000);}}
