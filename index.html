@@ -30,17 +30,12 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
 .label{font-size:10px;color:var(--muted);margin:0 0 4px 2px}
 .head{padding:12px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;gap:8px}
 .cap{font-size:10px;color:var(--muted)}
-.holeline{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
 .hole{font-size:28px;font-weight:900;line-height:1}
-.badge{display:inline-block;padding:6px 9px;border-radius:999px;font-size:10px;font-weight:800;border:1px solid #e7e5e4;background:#f5f5f4;color:#78716c}
-.modeSolo{background:#fef3c7;color:#92400e;border-color:#fde68a}.mode22{background:#dcfce7;color:#166534;border-color:#bbf7d0}.mode13{background:#ffe4e6;color:#9f1239;border-color:#fecdd3}
 .pot{text-align:right}.pot .value{margin-top:4px;font-size:22px;font-weight:900;color:#d97706}
-.team{background:#f8fafc;border-radius:16px;padding:10px 11px;font-size:13px;font-weight:900;color:#475569}
 .inner{padding:12px}
 .btn{height:40px;border:none;border-radius:16px;padding:0 10px;font-size:12px;font-weight:800;cursor:pointer}
-.btn.primary{background:#10b981;color:#fff}.btn.soft{background:#fff;color:#111827}.btn.warn{background:#f59e0b;color:#fff}
+.btn.primary{background:#10b981;color:#fff}
 .btn:disabled,.mini:disabled,.step:disabled{opacity:.42;cursor:not-allowed}
-.spinText{font-size:12px;font-weight:900;color:#0f766e;background:#ecfeff;border:1px solid #bae6fd;border-radius:14px;padding:8px 10px;margin-top:0;margin-bottom:6px;text-align:center;min-height:36px}
 .roundToggles,.flagToggles{display:flex;gap:6px;margin-top:8px}
 .mini{flex:1;height:30px;border-radius:12px;border:1px solid #d1d5db;background:#fff;font-size:10px;font-weight:800;color:#475569;cursor:pointer}
 .mini.active{background:#111827;color:#fff;border-color:#111827}
@@ -70,9 +65,18 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
 .drum-item.selected{color:#111827;font-size:21px}
 #hourDrum::-webkit-scrollbar,#minDrum::-webkit-scrollbar,#handyDrum::-webkit-scrollbar{display:none}
 .handy-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;margin-top:8px}
-.handy-btn{height:38px;border-radius:14px;border:1px solid #e5e7eb;background:#f8fafc;font-size:12px;font-weight:800;color:#374151;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:0 10px;width:100%}
+.handy-btn{height:38px;border-radius:14px;border:1px solid #e5e7eb;background:#f8fafc;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:0 8px;width:100%}
 .handy-btn .hname{font-size:11px;color:#6b7280;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.handy-btn .hval{font-size:13px;font-weight:900;color:#047857;background:#dcfce7;border-radius:8px;padding:2px 8px;flex-shrink:0}
+.handy-btn .hval{font-size:13px;font-weight:900;color:#047857;background:#dcfce7;border-radius:8px;padding:2px 6px;flex-shrink:0}
+
+/* 방식생성 슬롯머신 버튼 */
+.spin-btn-wrap{flex:1;height:34px;border-radius:12px;overflow:hidden;position:relative;background:#10b981;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center}
+.spin-slot{display:flex;flex-direction:column;align-items:center;transition:transform 0.08s ease;pointer-events:none}
+.spin-slot-item{height:34px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;white-space:nowrap;padding:0 10px}
+/* 홀 컨트롤 버튼 행 */
+.hole-controls{display:flex;align-items:center;gap:6px;margin-top:6px}
+.ctrl-btn{height:34px;border-radius:12px;border:1px solid #d1d5db;background:#fff;font-size:10px;font-weight:800;color:#475569;cursor:pointer;white-space:nowrap;padding:0 10px}
+.ctrl-btn.active{background:#111827;color:#fff;border-color:#111827}
 </style>
 </head>
 <body>
@@ -95,6 +99,7 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
       </div>
     </div>
 
+    <!-- 티오프 팝업 -->
     <div id="timePickerOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-end;justify-content:center">
       <div style="background:#fff;border-radius:24px 24px 0 0;padding:20px;width:100%;max-width:430px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -107,14 +112,14 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
             <div style="position:absolute;top:0;left:0;right:0;height:48px;background:linear-gradient(to bottom,#f8fafc,transparent);z-index:2;pointer-events:none"></div>
             <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(to top,#f8fafc,transparent);z-index:2;pointer-events:none"></div>
             <div style="position:absolute;top:50%;left:0;right:0;height:42px;transform:translateY(-50%);border-top:2px solid #10b981;border-bottom:2px solid #10b981;z-index:1;pointer-events:none"></div>
-            <div id="hourDrum" style="overflow-y:scroll;height:150px;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch"></div>
+            <div id="hourDrum" style="overflow-y:scroll;height:150px;scrollbar-width:none;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch"></div>
           </div>
           <span style="font-size:28px;font-weight:900;color:#374151;flex-shrink:0">:</span>
           <div style="flex:1;position:relative;height:150px;overflow:hidden;border:1px solid #e5e7eb;border-radius:16px;background:#f8fafc">
             <div style="position:absolute;top:0;left:0;right:0;height:48px;background:linear-gradient(to bottom,#f8fafc,transparent);z-index:2;pointer-events:none"></div>
             <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(to top,#f8fafc,transparent);z-index:2;pointer-events:none"></div>
             <div style="position:absolute;top:50%;left:0;right:0;height:42px;transform:translateY(-50%);border-top:2px solid #10b981;border-bottom:2px solid #10b981;z-index:1;pointer-events:none"></div>
-            <div id="minDrum" style="overflow-y:scroll;height:150px;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch"></div>
+            <div id="minDrum" style="overflow-y:scroll;height:150px;scrollbar-width:none;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch"></div>
           </div>
         </div>
         <div style="text-align:center;margin-top:14px;font-size:24px;font-weight:900;color:#111827" id="timeDisplay">07:00</div>
@@ -147,6 +152,7 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
     </div>
   </div>
 
+  <!-- 핸디 팝업 -->
   <div id="handyPickerOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-end;justify-content:center">
     <div style="background:#fff;border-radius:24px 24px 0 0;padding:20px;width:100%;max-width:430px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -159,7 +165,7 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
           <div style="position:absolute;top:0;left:0;right:0;height:48px;background:linear-gradient(to bottom,#f8fafc,transparent);z-index:2;pointer-events:none"></div>
           <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(to top,#f8fafc,transparent);z-index:2;pointer-events:none"></div>
           <div style="position:absolute;top:50%;left:0;right:0;height:42px;transform:translateY(-50%);border-top:2px solid #10b981;border-bottom:2px solid #10b981;z-index:1;pointer-events:none"></div>
-          <div id="handyDrum" style="overflow-y:scroll;height:150px;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch"></div>
+          <div id="handyDrum" style="overflow-y:scroll;height:150px;scrollbar-width:none;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch"></div>
         </div>
       </div>
       <div style="text-align:center;margin-top:14px;font-size:24px;font-weight:900;color:#047857" id="handyDisplay">0</div>
@@ -169,19 +175,24 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
   <div class="card">
     <div class="head">
       <div style="flex:1">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div class="cap">현재 홀</div><button class="mini" id="lockToggleBtn" style="flex:0 0 auto;padding:0 12px">Lock</button></div>
-        <div class="holeline">
+        <div class="cap">현재 홀</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
           <div class="hole" id="holeText">1</div>
-          <button class="btn primary" id="spinBtn" style="height:34px;padding:0 12px;border-radius:12px;font-size:11px;white-space:nowrap">🎰 방식 생성</button>
-          <span class="badge" id="modeBadge">미정</span>
-          <button class="mini" id="par3Btn" style="flex:0 0 auto;padding:0 12px;margin-left:auto">PAR3</button>
+          <!-- 방식생성 / PAR3 / LOCK 가로 한줄 -->
+          <div class="hole-controls" style="flex:1;margin-top:0">
+            <button id="spinBtn" class="spin-btn-wrap" onclick="spinCurrentMode()" style="flex:1">
+              <div class="spin-slot" id="spinSlot">
+                <div class="spin-slot-item">🎰 방식 생성</div>
+              </div>
+            </button>
+            <button id="par3Btn" class="ctrl-btn">PAR3</button>
+            <button id="lockToggleBtn" class="ctrl-btn">LOCK</button>
+          </div>
         </div>
       </div>
-      <div class="pot"><div class="cap">이번 홀 적용 금액</div><div class="value" id="potText">0원</div></div>
+      <div class="pot"><div class="cap">적용 금액</div><div class="value" id="potText">0원</div></div>
     </div>
     <div class="inner">
-      <div class="spinText" id="spinText">현재 홀에서 방식 생성 버튼을 눌러 주세요.</div>
-      <div class="team" id="teamText">방식 생성 전</div>
       <div class="scoreGrid" id="scoreGrid"></div>
       <div class="settle"><div class="k">자동 정산</div><div class="v" id="settlementText">방식을 생성하고 점수를 입력해 주세요.</div></div>
       <div class="holesWrap">
@@ -200,7 +211,7 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
 </div>
 
 <script>
-const STORAGE_KEY="golf-auto-v4";
+// 1. 열 때마다 빈칸 — 저장 안 함, 로드 안 함
 const PLAYERS=["A","B","C","D"];
 const MIN_SCORE=-1, MAX_SCORE=5;
 const MODES=[
@@ -213,13 +224,14 @@ const MODES=[
   {mode:"1:3",team:"C vs A+B+D"},
   {mode:"1:3",team:"D vs A+B+C"}
 ];
+const MODE_LABELS=["2vs2","1vs3","개인전"];
+
 function emptyFlags(){return {near:false,ddang:false,ok:false};}
 function makeRows(){return Array.from({length:18},(_,i)=>({hole:i+1,mode:"미정",team:"방식 생성 전",A:"",B:"",C:"",D:"",locked:false,par3:false,carryIn:0,appliedPot:0,winner:"",settlement:"",flags:{A:emptyFlags(),B:emptyFlags(),C:emptyFlags(),D:emptyFlags()}}));}
 function parseStake(v){const n=Number(String(v||"").replace(/[^0-9]/g,""));return Number.isFinite(n)?n:0;}
 function money(v){return `${Math.round(v||0).toLocaleString("ko-KR")}원`;}
 function displayName(names,p){return names[p]||p;}
 function prettyText(text,names){if(!text)return "";return String(text).replace(/[ABCD]/g,m=>names[m]||m);}
-function modeClass(mode){if(mode==="개인전")return "modeSolo";if(mode==="2:2")return "mode22";if(mode==="1:3")return "mode13";return "";}
 function score(v){if(v===""||v==null)return null;const n=Number(v);return Number.isFinite(n)?n:null;}
 function clampScore(n){return Math.max(MIN_SCORE,Math.min(MAX_SCORE,n));}
 function hasBirdie(row){return PLAYERS.some(p=>score(row[p])===-1);}
@@ -335,57 +347,45 @@ function calcTotals(){
   });
   return out;
 }
-let state=load();
-function load(){
-  try{
-    const raw=localStorage.getItem(STORAGE_KEY);if(!raw)throw new Error();
-    const s=JSON.parse(raw);
-    return {
-      meta:s.meta||{course:"",date:"",time:"",stake:""},
-      names:s.names||{A:"",B:"",C:"",D:""},
-      rules:s.rules||{ddangEnabled:true},
-      handy:s.handy||{A:0,B:0,C:0,D:0},
-      rows:s.rows||makeRows(),
-      hole:s.hole||1,
-      spinning:false
-    };
-  }catch{
-    return {meta:{course:"",date:"",time:"",stake:""},names:{A:"",B:"",C:"",D:""},rules:{ddangEnabled:true},handy:{A:0,B:0,C:0,D:0},rows:makeRows(),hole:1,spinning:false};
-  }
-}
-function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}
+
+// 열 때마다 항상 새 상태
+let state={
+  meta:{course:"",date:"",time:"",stake:""},
+  names:{A:"",B:"",C:"",D:""},
+  rules:{ddangEnabled:true},
+  handy:{A:0,B:0,C:0,D:0},
+  rows:makeRows(),
+  hole:1,
+  spinning:false
+};
+
 const el={
   course:document.getElementById("courseInput"),date:document.getElementById("dateInput"),time:document.getElementById("timeInput"),stake:document.getElementById("stakeInput"),
   nameA:document.getElementById("nameA"),nameB:document.getElementById("nameB"),nameC:document.getElementById("nameC"),nameD:document.getElementById("nameD"),
   ddangRuleBtn:document.getElementById("ddangRuleBtn"),
-  spinBtn:document.getElementById("spinBtn"),spinText:document.getElementById("spinText"),progressText:document.getElementById("progressText"),
+  spinBtn:document.getElementById("spinBtn"),spinSlot:document.getElementById("spinSlot"),progressText:document.getElementById("progressText"),
   totalNameA:document.getElementById("totalNameA"),totalNameB:document.getElementById("totalNameB"),totalNameC:document.getElementById("totalNameC"),totalNameD:document.getElementById("totalNameD"),
   totalA:document.getElementById("totalA"),totalB:document.getElementById("totalB"),totalC:document.getElementById("totalC"),totalD:document.getElementById("totalD"),
-  holeText:document.getElementById("holeText"),modeBadge:document.getElementById("modeBadge"),potText:document.getElementById("potText"),teamText:document.getElementById("teamText"),
+  holeText:document.getElementById("holeText"),potText:document.getElementById("potText"),
   scoreGrid:document.getElementById("scoreGrid"),settlementText:document.getElementById("settlementText"),
-  par3Btn:document.getElementById("par3Btn"),holesGrid:document.getElementById("holesGrid"),
+  par3Btn:document.getElementById("par3Btn"),holesGrid:document.getElementById("holesGrid"),lockBtn:document.getElementById("lockToggleBtn"),
   handyGrid:document.getElementById("handyGrid")
 };
+
 function syncInputs(){
   state.meta.course=el.course.value;state.meta.date=el.date.value;state.meta.time=el.time.value;state.meta.stake=el.stake.value.replace(/[^0-9]/g,"");
   state.names.A=el.nameA.value;state.names.B=el.nameB.value;state.names.C=el.nameC.value;state.names.D=el.nameD.value;
   recomputeRows();
 }
-function bindInputs(){
-  el.course.value=state.meta.course||"";el.date.value=state.meta.date||"";
-  if(state.meta.time)el.time.value=state.meta.time;
-  el.stake.value=state.meta.stake||"";
-  el.nameA.value=state.names.A||"";el.nameB.value=state.names.B||"";el.nameC.value=state.names.C||"";el.nameD.value=state.names.D||"";
-}
 function changeScore(player,dir){
   const row=state.rows.find(r=>r.hole===state.hole);if(row.locked||row.mode==="미정")return;
   const cur=row[player]===""?0:Number(row[player]);row[player]=String(clampScore(cur+dir));
-  recomputeRows();save();render();
+  recomputeRows();render();
 }
 function togglePar3(){
   const row=state.rows.find(r=>r.hole===state.hole);if(row.locked)return;
   row.par3=!row.par3;if(!row.par3){PLAYERS.forEach(p=>row.flags[p].near=false);}
-  recomputeRows();save();render();
+  recomputeRows();render();
 }
 function toggleFlag(player,flag){
   const row=state.rows.find(r=>r.hole===state.hole);if(row.locked||row.mode==="미정")return;
@@ -396,32 +396,76 @@ function toggleFlag(player,flag){
   }else{
     row.flags[player].ddang=false;row.flags[player].ok=false;row.flags[player][flag]=!current;
   }
-  recomputeRows();save();render();
+  recomputeRows();render();
 }
 function toggleLockCurrent(){
   const row=state.rows.find(r=>r.hole===state.hole);
-  row.locked=!row.locked;save();render();
+  row.locked=!row.locked;render();
 }
-function setHole(h){state.hole=h;save();render();}
+function setHole(h){state.hole=h;render();}
+
+// 슬롯머신 애니메이션
 function spinCurrentMode(){
   const row=state.rows.find(r=>r.hole===state.hole);
   if(row.locked||state.spinning||row.mode!=="미정")return;
-  state.spinning=true;el.spinBtn.disabled=true;
+  state.spinning=true;
+  el.spinBtn.disabled=true;
+
   const finalPick=MODES[Math.floor(Math.random()*MODES.length)];
-  let ticks=0;
-  const timer=setInterval(()=>{
-    const preview=MODES[Math.floor(Math.random()*MODES.length)];
-    el.spinText.textContent=`룰렛 중… ${preview.mode} · ${prettyText(preview.team,state.names)}`;
-    ticks++;
-    if(ticks>=24){
-      clearInterval(timer);
-      row.mode=finalPick.mode;row.team=finalPick.team;row.locked=false;
-      state.spinning=false;recomputeRows();save();render();
-      el.spinText.textContent=`결정: ${finalPick.mode} · ${prettyText(finalPick.team,state.names)}`;
-      el.spinBtn.disabled=false;
+  const slot=el.spinSlot;
+
+  // 슬롯 아이템 빌드 (랜덤 라벨들 + 최종 결과)
+  const spins=[];
+  for(let i=0;i<8;i++) spins.push(MODE_LABELS[Math.floor(Math.random()*MODE_LABELS.length)]);
+  const finalLabel=finalPick.mode==="2:2"?"2vs2":finalPick.mode==="1:3"?"1vs3":"개인전";
+  spins.push(finalLabel);
+
+  slot.innerHTML=spins.map(s=>`<div class="spin-slot-item">${s}</div>`).join("");
+  slot.style.transition="none";
+  slot.style.transform="translateY(0)";
+
+  let idx=0;
+  const itemH=34;
+  const interval=setInterval(()=>{
+    idx++;
+    const speed=idx<spins.length-2?60:idx<spins.length-1?120:200;
+    slot.style.transition=`transform ${speed}ms cubic-bezier(0.25,0.46,0.45,0.94)`;
+    slot.style.transform=`translateY(-${idx*itemH}px)`;
+    if(idx>=spins.length-1){
+      clearInterval(interval);
+      setTimeout(()=>{
+        row.mode=finalPick.mode;row.team=finalPick.team;row.locked=false;
+        state.spinning=false;
+        recomputeRows();render();
+      },250);
     }
-  },90);
+  },speed=>60);
+
+  // 속도 가변 처리를 위해 재귀로 변경
+  clearInterval(interval);
+  let step=0;
+  function nextStep(){
+    if(step>=spins.length-1){
+      setTimeout(()=>{
+        row.mode=finalPick.mode;row.team=finalPick.team;row.locked=false;
+        state.spinning=false;
+        el.spinBtn.disabled=false;
+        recomputeRows();render();
+      },300);
+      return;
+    }
+    step++;
+    const delay=step<5?60:step<7?100:step<8?180:300;
+    slot.style.transition=`transform ${delay*0.8}ms cubic-bezier(0.25,0.46,0.45,0.94)`;
+    slot.style.transform=`translateY(-${step*itemH}px)`;
+    setTimeout(nextStep, delay);
+  }
+  // 초기화 후 시작
+  slot.style.transform="translateY(0)";
+  slot.style.transition="none";
+  setTimeout(nextStep,30);
 }
+
 function renderHandyGrid(){
   if(!el.handyGrid)return;
   el.handyGrid.innerHTML=PLAYERS.map(p=>{
@@ -433,32 +477,50 @@ function renderHandyGrid(){
     </button>`;
   }).join("");
 }
+
 function render(){
-  syncInputs();save();
+  syncInputs();
   const row=state.rows.find(r=>r.hole===state.hole)||state.rows[0];
   const totals=calcTotals();
   const nearOwner=PLAYERS.find(p=>row.flags[p].near);
   const progress=state.rows.filter(r=>r.mode!=="미정"||PLAYERS.some(p=>r[p]!="")||r.par3).length;
   const isZero=row.mode==="미정";
+  const ddangOff=!state.rules.ddangEnabled; // 2. 땡그랑 노인정이면 ddang/ok 비활성
+
   el.progressText.textContent=`${progress}/18`;
   el.totalNameA.textContent=displayName(state.names,"A");el.totalNameB.textContent=displayName(state.names,"B");el.totalNameC.textContent=displayName(state.names,"C");el.totalNameD.textContent=displayName(state.names,"D");
   el.totalA.textContent="-"+money(totals.A);el.totalB.textContent="-"+money(totals.B);el.totalC.textContent="-"+money(totals.C);el.totalD.textContent="-"+money(totals.D);
   el.ddangRuleBtn.className="mini "+(state.rules.ddangEnabled?"active":"");
   el.ddangRuleBtn.textContent=state.rules.ddangEnabled?"땡그랑 인정":"땡그랑 노인정";
   el.holeText.textContent=row.hole;
-  el.modeBadge.textContent=isZero?"미정":row.mode;
-  el.modeBadge.className="badge "+(isZero?"":modeClass(row.mode));
   el.potText.textContent=money(row.appliedPot||parseStake(state.meta.stake));
-  el.teamText.textContent=isZero?"방식 생성 전":prettyText(row.team,state.names);
-  el.par3Btn.className="mini "+(row.par3?"active":"");
-  const spinDisabled=row.mode!=="미정";
-  el.spinBtn.disabled=spinDisabled;
-  if(spinDisabled){el.spinBtn.classList.add("disabledVisual");}else{el.spinBtn.classList.remove("disabledVisual");}
+  el.par3Btn.className="ctrl-btn"+(row.par3?" active":"");
+  el.lockBtn.className="ctrl-btn"+(row.locked?" active":"");
+
+  // 방식생성 버튼 상태
+  if(!isZero && !state.spinning){
+    const label=row.mode==="2:2"?"2vs2":row.mode==="1:3"?"1vs3":"개인전";
+    el.spinSlot.innerHTML=`<div class="spin-slot-item">${label} ✓</div>`;
+    el.spinSlot.style.transform="translateY(0)";
+    el.spinBtn.disabled=true;
+    el.spinBtn.style.background="#6b7280";
+  }else if(isZero){
+    if(!state.spinning){
+      el.spinSlot.innerHTML=`<div class="spin-slot-item">🎰 방식 생성</div>`;
+      el.spinSlot.style.transform="translateY(0)";
+    }
+    el.spinBtn.disabled=false;
+    el.spinBtn.style.background="#10b981";
+  }
+
   el.settlementText.textContent=isZero?"방식을 생성하고 점수를 입력해 주세요.":(prettyText(row.settlement,state.names)||"방식을 생성하고 점수를 입력해 주세요.");
-  if(isZero&&!state.spinning)el.spinText.textContent="현재 홀에서 방식 생성 버튼을 눌러 주세요.";
+
   el.scoreGrid.innerHTML=PLAYERS.map(p=>{
     const f=row.flags[p];
     const nearDisabled=!row.par3||(!!nearOwner&&nearOwner!==p);
+    // 2. 땡그랑 노인정이면 ddang/ok 버튼 비활성
+    const ddangDisabled=row.locked||isZero||ddangOff;
+    const okDisabled=row.locked||isZero||ddangOff;
     return `<div class="scoreBox">
       <div class="scoreTop"><div class="scoreName">${displayName(state.names,p)}</div></div>
       <div class="stepRow">
@@ -467,12 +529,13 @@ function render(){
         <button class="step" ${row.locked||isZero?'disabled':''} onclick="changeScore('${p}',1)">+</button>
       </div>
       <div class="flagToggles">
-        <button class="mini ${f.ddang?'active':''}" ${row.locked||isZero?'disabled':''} onclick="toggleFlag('${p}','ddang')">땡그랑</button>
-        <button class="mini ${f.ok?'active':''}" ${row.locked||isZero?'disabled':''} onclick="toggleFlag('${p}','ok')">OK</button>
+        <button class="mini ${f.ddang?'active':''}" ${ddangDisabled?'disabled':''} onclick="toggleFlag('${p}','ddang')">땡그랑</button>
+        <button class="mini ${f.ok?'active':''}" ${okDisabled?'disabled':''} onclick="toggleFlag('${p}','ok')">OK</button>
         <button class="mini ${f.near?'active':''}" ${row.locked||isZero||nearDisabled?'disabled':''} onclick="toggleFlag('${p}','near')">니어</button>
       </div>
     </div>`;
   }).join("");
+
   el.holesGrid.innerHTML=state.rows.map(r=>{
     const done=r.mode!=="미정"||PLAYERS.some(p=>r[p]!="")||r.par3;
     const cls=state.hole===r.hole?"active":(done?"done":"");
@@ -488,8 +551,7 @@ document.getElementById("nameA").addEventListener("input",render);
 document.getElementById("nameB").addEventListener("input",render);
 document.getElementById("nameC").addEventListener("input",render);
 document.getElementById("nameD").addEventListener("input",render);
-document.getElementById("ddangRuleBtn").addEventListener("click",()=>{state.rules.ddangEnabled=!state.rules.ddangEnabled;recomputeRows();save();render();});
-document.getElementById("spinBtn").addEventListener("click",spinCurrentMode);
+document.getElementById("ddangRuleBtn").addEventListener("click",()=>{state.rules.ddangEnabled=!state.rules.ddangEnabled;recomputeRows();render();});
 document.getElementById("par3Btn").addEventListener("click",togglePar3);
 document.getElementById("lockToggleBtn").addEventListener("click",toggleLockCurrent);
 
@@ -529,7 +591,7 @@ document.getElementById("lockToggleBtn").addEventListener("click",toggleLockCurr
   window.confirmTimePicker=function(){
     const str=String(selH).padStart(2,'0')+':'+String(selM).padStart(2,'0');
     document.getElementById('timeInput').value=str;
-    state.meta.time=str;save();closeTimePicker();render();
+    state.meta.time=str;closeTimePicker();render();
   };
   document.getElementById('timePickerOverlay').addEventListener('click',function(e){if(e.target===this)closeTimePicker();});
 })();
@@ -567,7 +629,7 @@ document.getElementById("lockToggleBtn").addEventListener("click",toggleLockCurr
   window.closeHandyPicker=function(){document.getElementById('handyPickerOverlay').style.display='none';};
   window.confirmHandyPicker=function(){
     if(selP)state.handy[selP]=selV;
-    save();closeHandyPicker();render();
+    closeHandyPicker();render();
   };
   document.getElementById('handyPickerOverlay').addEventListener('click',function(e){if(e.target===this)closeHandyPicker();});
 })();
@@ -598,8 +660,9 @@ window.selectCourse=selectCourse;
 window.changeScore=changeScore;
 window.toggleFlag=toggleFlag;
 window.setHole=setHole;
+window.spinCurrentMode=spinCurrentMode;
 
-bindInputs();recomputeRows();render();
+render();
 </script>
 <script>
   if('serviceWorker' in navigator){navigator.serviceWorker.register('/golf-app/sw.js');}
