@@ -234,7 +234,7 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
 <div class="card">
   <div class="head">
     <div style="display:flex;align-items:center;gap:0">
-      <!-- 왼쪽: 홀번호 + 방식생성 + PAR3 한 묶음 -->
+      <!-- 왼쪽: 홀번호 + 방식생성 + PAR3 + LOCK 한 묶음 -->
       <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
         <div style="display:flex;align-items:baseline;gap:2px">
           <div style="font-size:26px;font-weight:900;line-height:1;color:#111827" id="holeText">1</div>
@@ -248,12 +248,12 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
           </div>
         </button>
         <button id="par3Btn" onclick="togglePar3()" style="width:50px;height:40px;border-radius:12px;border:1px solid #e5e7eb;background:#f8fafc;font-size:10px;font-weight:900;color:#475569;cursor:pointer">PAR3</button>
+        <button id="lockToggleBtn" onclick="toggleLockCurrent()" style="width:40px;height:40px;border-radius:12px;border:1px solid #e5e7eb;background:#f8fafc;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">🔓</button>
       </div>
       <!-- 여백 -->
       <div style="flex:1"></div>
-      <!-- 오른쪽: LOCK + 금액 -->
+      <!-- 오른쪽: 금액 -->
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-        <button id="lockToggleBtn" onclick="toggleLockCurrent()" style="width:50px;height:40px;border-radius:12px;border:1px solid #e5e7eb;background:#f8fafc;font-size:10px;font-weight:900;color:#475569;cursor:pointer">LOCK</button>
         <div id="potText" style="font-size:20px;font-weight:900;color:#d97706;white-space:nowrap;min-width:72px;text-align:right">0원</div>
       </div>
     </div>
@@ -653,9 +653,9 @@ function render(){
 
   // LOCK: 정산이 확정됐을 때만 활성화 가능 (잠긴 상태이거나 winner가 있을 때)
   const canLock=row.locked||(row.winner&&row.winner!=="");
-  el.lockBtn.style.background=row.locked?'#ef4444':canLock?'#f8fafc':'#f1f5f9';
-  el.lockBtn.style.color=row.locked?'#fff':canLock?'#475569':'#d1d5db';
-  el.lockBtn.style.borderColor=row.locked?'#ef4444':canLock?'#e5e7eb':'#f1f5f9';
+  el.lockBtn.textContent=row.locked?'🔒':'🔓';
+  el.lockBtn.style.background=row.locked?'#fef2f2':canLock?'#f8fafc':'#f1f5f9';
+  el.lockBtn.style.borderColor=row.locked?'#fecaca':canLock?'#e5e7eb':'#f1f5f9';
   el.lockBtn.disabled=!canLock;
   const IS='height:40px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;letter-spacing:0.3px';
   const teamEl=document.getElementById('teamText'),teamBox=document.getElementById('teamBox');
