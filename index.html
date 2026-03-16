@@ -175,7 +175,7 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
       <div class="grid2" style="margin-top:0;gap:8px">
         <div style="background:#f8fafc;border-radius:12px;padding:8px 10px;border:1px solid #e5e7eb">
           <div class="toggle-row">
-            <span class="toggle-label">땡그랑</span>
+            <span class="toggle-label">땡그랑 > OK</span>
             <label class="toggle-switch">
               <input type="checkbox" id="ddangToggle" onchange="toggleDdang()" checked>
               <span class="toggle-track"></span>
@@ -185,7 +185,7 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
         </div>
         <div style="background:#f8fafc;border-radius:12px;padding:8px 10px;border:1px solid #e5e7eb">
           <div class="toggle-row">
-            <span class="toggle-label">니어 승부</span>
+            <span class="toggle-label">PAR3 니어 승부</span>
             <label class="toggle-switch">
               <input type="checkbox" id="nearToggle" onchange="toggleNear()">
               <span class="toggle-track"></span>
@@ -629,8 +629,6 @@ function render(){
   el.totalNameC.textContent=displayName(state.names,"C");el.totalNameD.textContent=displayName(state.names,"D");
   el.totalA.textContent="-"+money(totals.A);el.totalB.textContent="-"+money(totals.B);
   el.totalC.textContent="-"+money(totals.C);el.totalD.textContent="-"+money(totals.D);
-  el.ddangRuleBtn.className="mini"+(state.rules.ddangEnabled?" active":"");
-  el.ddangRuleBtn.textContent=state.rules.ddangEnabled?"인정":"노인정";
   el.holeText.textContent=row.hole;
   document.getElementById('holeProgress').textContent='/18';
   el.potText.textContent=money(row.appliedPot||parseStake(state.meta.stake));
