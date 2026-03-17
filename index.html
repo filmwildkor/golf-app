@@ -694,49 +694,34 @@ function render(){
   const msgStyle='min-height:74px;display:flex;align-items:center;justify-content:center;background:linear-gradient(90deg,#ecfdf5,#f7fee7);border:1px solid #d1fae5;border-radius:20px;margin-top:8px';
   const gridStyle='display:grid;grid-template-columns:1fr 1fr 1fr 1fr;border-radius:20px;overflow:hidden;margin-top:8px';
 
-  if(isZero){
-    settleBox.setAttribute('style',msgStyle);
-    settleBox.innerHTML=`<div class="settle-empty">방식을 생성하고 점수를 입력해 주세요.</div>`;
-  } else if(!row.settlement||row.settlement==='점수를 모두 입력해 주세요.'||row.settlement==='땡그랑 / OK 를 모두 확인해주세요.'){
-    settleBox.setAttribute('style',gridStyle);
-    settleBox.innerHTML=PLAYERS.map((p,i)=>{
-      const name=displayName(state.names,p);
-      const br=i<3?'border-right:1px solid rgba(16,185,129,0.18)':'';
-      return `<div style="position:relative;height:96px;overflow:hidden;background:#e8f8f0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:11px;${br}">
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">${billSvg()}</div>
-        <div style="position:relative;font-size:11px;font-weight:700;color:#065f46;z-index:2">${name}</div>
-      </div>`;
-    }).join('');
-  } else {
-    // 무승부 포함 항상 4칸 그리드
-    const amounts={A:0,B:0,C:0,D:0};
-    const pot=row.appliedPot||0;
-    const isMuSeungBu=row.winner==='무승부';
-    if(row.winner&&!isMuSeungBu){
-      if(row.mode==='개인전'){const ranked=[...PLAYERS].sort((a,b)=>compareRank(a,b,row));ranked.slice(1).forEach(p=>amounts[p]+=pot);}
-      else if(row.mode==='2:2'){const [left,right]=row.team.split(' vs ');(row.winner===left?right:left).split('+').forEach(p=>amounts[p]+=pot);}
-      else if(row.mode==='1:3'){const calc=get13Calc(row);if(calc){if(row.winner===calc.solo){row.team.split(' vs ')[1].split('+').forEach(p=>amounts[p]+=pot);}else{amounts[calc.solo]+=pot*3;}}}
-    }
-    if(row.par3&&state.rules.nearEnabled){const nw=PLAYERS.find(p=>row.flags[p].near);if(nw){PLAYERS.filter(p=>p!==nw).forEach(p=>amounts[p]+=10000);}}
-    settleBox.setAttribute('style',gridStyle);
-    settleBox.innerHTML=PLAYERS.map((p,i)=>{
-      const name=displayName(state.names,p);
-      const amt=amounts[p];
-      const br=i<3?'border-right:1px solid rgba(16,185,129,0.18)':'';
-      const amtText=amt>0?(amt%10000===0?`${amt/10000}만`:`${(amt/10000).toFixed(1)}만`):'';
-      let overlay='';
-      if(isMuSeungBu){
-        overlay=`<div style="position:absolute;inset:0;background:rgba(22,22,22,0.86);display:flex;align-items:center;justify-content:center;z-index:3;${br}"><div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.5)">무승부</div></div>`;
-      }else if(amt>0){
-        overlay=`<div style="position:absolute;inset:0;background:rgba(22,22,22,0.86);display:flex;align-items:center;justify-content:center;z-index:3;${br}"><div style="font-size:20px;font-weight:900;color:#ff3b30;letter-spacing:-0.5px">-${amtText}</div></div>`;
-      }
-      return `<div style="position:relative;height:96px;overflow:hidden;background:#e8f8f0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:11px;${br}">
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">${billSvg()}</div>
-        <div style="position:relative;font-size:11px;font-weight:700;color:#065f46;z-index:2">${name}</div>
-        ${overlay}
-      </div>`;
-    }).join('');
+  // 항상 4칸 그리드 고정
+  settleBox.setAttribute('style',gridStyle);
+  const amounts={A:0,B:0,C:0,D:0};
+  const pot=row.appliedPot||0;
+  const isMuSeungBu=row.winner==='무승부';
+  if(row.winner&&!isMuSeungBu){
+    if(row.mode==='개인전'){const ranked=[...PLAYERS].sort((a,b)=>compareRank(a,b,row));ranked.slice(1).forEach(p=>amounts[p]+=pot);}
+    else if(row.mode==='2:2'){const [left,right]=row.team.split(' vs ');(row.winner===left?right:left).split('+').forEach(p=>amounts[p]+=pot);}
+    else if(row.mode==='1:3'){const calc=get13Calc(row);if(calc){if(row.winner===calc.solo){row.team.split(' vs ')[1].split('+').forEach(p=>amounts[p]+=pot);}else{amounts[calc.solo]+=pot*3;}}}
   }
+  if(row.par3&&state.rules.nearEnabled){const nw=PLAYERS.find(p=>row.flags[p].near);if(nw){PLAYERS.filter(p=>p!==nw).forEach(p=>amounts[p]+=10000);}}
+  settleBox.innerHTML=PLAYERS.map((p,i)=>{
+    const name=displayName(state.names,p);
+    const amt=amounts[p];
+    const br=i<3?'border-right:1px solid rgba(16,185,129,0.18)':'';
+    const amtText=amt>0?(amt%10000===0?`${amt/10000}만`:`${(amt/10000).toFixed(1)}만`):'';
+    let overlay='';
+    if(isMuSeungBu){
+      overlay=`<div style="position:absolute;inset:0;background:rgba(22,22,22,0.86);display:flex;align-items:center;justify-content:center;z-index:3;${br}"><div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.5)">무승부</div></div>`;
+    }else if(amt>0){
+      overlay=`<div style="position:absolute;inset:0;background:rgba(22,22,22,0.86);display:flex;align-items:center;justify-content:center;z-index:3;${br}"><div style="font-size:20px;font-weight:900;color:#ff3b30;letter-spacing:-0.5px">-${amtText}</div></div>`;
+    }
+    return `<div style="position:relative;height:96px;overflow:hidden;background:#e8f8f0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:11px;${br}">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">${billSvg()}</div>
+      <div style="position:relative;font-size:11px;font-weight:700;color:#065f46;z-index:2">${name}</div>
+      ${overlay}
+    </div>`;
+  }).join('');
   el.scoreGrid.innerHTML=PLAYERS.map(p=>{
     const f=row.flags[p];
     // 니어: par3 켜져있고, locked 아니고, 방식생성 됐을 때 활성
