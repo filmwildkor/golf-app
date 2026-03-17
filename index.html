@@ -45,13 +45,17 @@ input{width:100%;height:38px;border-radius:14px;border:1px solid var(--line);pad
 .flagToggles{display:flex;gap:4px;margin-top:8px}
 
 /* 정산 */
-.settle{border:1px solid #d1fae5;background:linear-gradient(90deg,#ecfdf5,#f7fee7);border-radius:20px;padding:11px 14px;margin-top:8px;min-height:74px;display:flex;align-items:center}
-.settle-inner{width:100%}
-.settle-line{display:flex;align-items:baseline;gap:6px;line-height:1.9}
-.settle-key{font-size:13px;font-weight:800;color:#047857;width:40px;flex-shrink:0}
-.settle-val{display:flex;flex-wrap:wrap;gap:0}
-.settle-item{font-size:13px;font-weight:800;color:#064e3b;white-space:nowrap;min-width:90px}
-.settle-empty{font-size:13px;font-weight:700;color:#9ca3af;text-align:center;width:100%}
+.settle{border-radius:20px;overflow:hidden;margin-top:8px}
+.settle-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0}
+.settle-card{position:relative;height:96px;overflow:hidden;background:#e8f8f0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:11px;border-right:1px solid rgba(16,185,129,0.18)}
+.settle-card:last-child{border-right:none}
+.settle-bill{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.settle-name{position:relative;font-size:11px;font-weight:700;color:#065f46;z-index:2;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90%}
+.settle-overlay{position:absolute;inset:0;background:rgba(22,22,22,0.86);display:flex;align-items:center;justify-content:center;z-index:3;border-right:1px solid rgba(16,185,129,0.18)}
+.settle-overlay:last-child{border-right:none}
+.settle-amount{font-size:20px;font-weight:900;color:#ff3b30;letter-spacing:-0.5px;line-height:1}
+.settle-msg{background:linear-gradient(90deg,#ecfdf5,#f7fee7);border:1px solid #d1fae5;min-height:74px;display:flex;align-items:center;justify-content:center}
+.settle-empty{font-size:13px;font-weight:400;color:#9ca3af;text-align:center;width:100%}
 
 /* 홀 이동 */
 .holesWrap{margin-top:8px}
@@ -673,30 +677,70 @@ function render(){
   }
   // 정산 칸 렌더링
   const settleEl=document.getElementById('settlementText');
-  if(!row.settlement||isZero){
-    settleEl.innerHTML=`<div class="settle-empty">${isZero?"방식을 생성하고 점수를 입력해 주세요.":prettyText(row.settlement,state.names)||"방식을 생성하고 점수를 입력해 주세요."}</div>`;
-  }else{
-    const rawLines=prettyText(row.settlement,state.names).split('\n');
-    settleEl.innerHTML=rawLines.map(line=>{
-      if(line.includes(' : ')){
-        const colonIdx=line.indexOf(' : ');
-        const key=line.substring(0,colonIdx);
-        const rest=line.substring(colonIdx+3);
-        const items=rest.split('  |  ');
-        // 각 아이템을 "이름 고정폭 + 장수 고정폭" 으로 분리
-        const itemsHtml=items.map(item=>{
-          // "홍길동 2장" → 마지막 공백으로 이름/값 분리
-          const lastSpace=item.lastIndexOf(' ');
-          if(lastSpace>0){
-            const name=item.substring(0,lastSpace);
-            const val=item.substring(lastSpace+1);
-            return `<span style="display:inline-flex;min-width:100px"><span style="flex:1;overflow:hidden;text-overflow:ellipsis">${name}</span><span style="min-width:28px;text-align:right;padding-left:2px">${val}</span></span>`;
-          }
-          return `<span style="min-width:100px">${item}</span>`;
-        }).join('');
-        return `<div class="settle-line"><span class="settle-key">${key} :</span><span class="settle-val">${itemsHtml}</span></div>`;
+  const settleBox=document.getElementById('settleBox');
+
+  // 지폐 SVG (돈다발 느낌)
+  function billSvg(){
+    return `<svg viewBox="0 0 72 52" width="66" height="48" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6" y="11" width="62" height="37" rx="4" fill="#059669" opacity="0.25"/>
+      <rect x="4" y="8"  width="62" height="37" rx="4" fill="#059669" opacity="0.4"/>
+      <rect x="2" y="5"  width="62" height="37" rx="4" fill="#059669" opacity="0.55"/>
+      <rect x="0" y="2"  width="62" height="37" rx="4" fill="#047857" opacity="0.75"/>
+      <rect x="0" y="0"  width="62" height="37" rx="4" fill="#065f46"/>
+      <rect x="4" y="4"  width="54" height="29" rx="3" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <rect x="8" y="8"  width="46" height="21" rx="7" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+      <rect x="4"  y="4"  width="8" height="6" rx="1.5" fill="rgba(255,255,255,0.1)"/>
+      <rect x="50" y="27" width="8" height="6" rx="1.5" fill="rgba(255,255,255,0.1)"/>
+      <text x="31" y="23" text-anchor="middle" font-size="11" font-weight="900" fill="rgba(255,255,255,0.45)" font-family="Georgia,serif" letter-spacing="2">$$$</text>
+    </svg>`;
+  }
+
+  if(isZero){
+    settleBox.className='settle settle-msg';
+    settleEl.innerHTML=`<div class="settle-empty">방식을 생성하고 점수를 입력해 주세요.</div>`;
+  } else if(!row.settlement || row.settlement==='점수를 모두 입력해 주세요.' || row.settlement==='땡그랑 / OK 를 모두 확인해주세요.'){
+    settleBox.className='settle settle-grid';
+    settleEl.innerHTML=PLAYERS.map((p,i)=>{
+      const name=displayName(state.names,p);
+      return `<div class="settle-card">
+        <div class="settle-bill">${billSvg()}</div>
+        <div class="settle-name">${name}</div>
+      </div>`;
+    }).join('');
+  } else {
+    const amounts={A:0,B:0,C:0,D:0};
+    const pot=row.appliedPot||0;
+    if(row.winner&&row.winner!=='무승부'){
+      if(row.mode==='개인전'){
+        const ranked=[...PLAYERS].sort((a,b)=>compareRank(a,b,row));
+        ranked.slice(1).forEach(p=>amounts[p]+=pot);
+      }else if(row.mode==='2:2'){
+        const [left,right]=row.team.split(' vs ');
+        const losers=(row.winner===left?right:left).split('+');
+        losers.forEach(p=>amounts[p]+=pot);
+      }else if(row.mode==='1:3'){
+        const calc=get13Calc(row);
+        if(calc){
+          if(row.winner===calc.solo){row.team.split(' vs ')[1].split('+').forEach(p=>amounts[p]+=pot);}
+          else{amounts[calc.solo]+=pot*3;}
+        }
       }
-      return `<div class="settle-line">${line}</div>`;
+    }
+    if(row.par3&&state.rules.nearEnabled){
+      const nw=PLAYERS.find(p=>row.flags[p].near);
+      if(nw){PLAYERS.filter(p=>p!==nw).forEach(p=>amounts[p]+=10000);}
+    }
+    settleBox.className='settle settle-grid';
+    settleEl.innerHTML=PLAYERS.map((p,i)=>{
+      const name=displayName(state.names,p);
+      const amt=amounts[p];
+      const amtText=amt>0?(amt%10000===0?`${amt/10000}만`:`${(amt/10000).toFixed(1)}만`):'';
+      const overlay=amt>0?`<div class="settle-overlay"><div class="settle-amount">-${amtText}</div></div>`:'';
+      return `<div class="settle-card">
+        <div class="settle-bill">${billSvg()}</div>
+        <div class="settle-name">${name}</div>
+        ${overlay}
+      </div>`;
     }).join('');
   }
   el.scoreGrid.innerHTML=PLAYERS.map(p=>{
